@@ -1,0 +1,45 @@
+# MIT License - Unlimited Account
+
+Copyright (c) 2025 World Sea Food Producers Association
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+## 1. License Pair Requirement
+- Permission is granted only when a valid public/private key pair license is presented.
+- The person obtaining the Software must possess a booth unlimited EMR institutional license.
+
+## 2. Inclusion of Notices
+- The above copyright notice and this permission notice shall be included
+  in all copies or substantial portions of the Software.
+
+## 3. Usage Permissions (Public Key Components)
+- **Unlimited use** for institutional purposes.
+- Ability to **distribute, sublicense, and sell** the Software without additional permissions.
+- Full access to **SeaSide, DeckSide, and DockSide** modules.
+
+## 4. ODOO Integration Rights
+- Unrestricted integration with ODOO accounting modules.
+- Permission to create derivative works for ODOO marketplace.
+- Community contribution and open source collaboration allowed.
+
+## 5. Modules Covered by Unlimited License
+- **SeaSide (HOLD)** - Vessel operations and telemetry
+- **DeckSide (RECORD)** - Catch recording and verification
+- **DockSide (STORE)** - Storage and compliance management
+
+## 6. Usage Restrictions
+- Unauthorized use, distribution, or modification outside the scope of the provided licenses is prohibited.
+- MarketSide module is NOT covered by this license (see LICENSE.limited).
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
