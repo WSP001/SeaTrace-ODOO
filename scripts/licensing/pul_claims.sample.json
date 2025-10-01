@@ -1,0 +1,11 @@
+{
+  "typ": "PUL",
+  "ver": 1,
+  "license_id": "pul-2025-01",
+  "org": "any",
+  "pillars": ["seaside", "deckside", "dockside"],
+  "features": ["qr_public", "schemas_v1", "otel_metrics"],
+  "scope_digest": "sha256:REPLACE_WITH_GENERATED_DIGEST",
+  "exp": 4070908800,
+  "notice": "Public Unlimited (FREE). No MarketSide premium access."
+}

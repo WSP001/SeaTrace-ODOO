@@ -1,4 +1,12 @@
-# Python
+# Keys & Tokens (CRITICAL - DO NOT COMMIT)
+keys/
+*.token
+*.key
+*.pub
+.env
+.env.*
+
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class

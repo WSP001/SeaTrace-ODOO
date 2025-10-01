@@ -58,10 +58,21 @@ The **SeaTrace-ODOO Enterprise Integration Suite** combines SeaTrace's blockchai
 ## 🔐 Dual Licensing Strategy
 
 > **Licensing at a glance:**  
-> • **Free public modules (PUL):** [SeaSide/DeckSide/DockSide scope & token](docs/licensing/PUBLIC-UNLIMITED.md)  
-> • **Monetized MarketSide (PL):** [Entitlements & pricing](docs/licensing/PRIVATE-LIMITED.md)
+> • **Free (PUL)** — Sea/Deck/Dock endpoints only. No token needed for public routes, or pass the signed PUL token.  
+> • **Paid (PL)** — MarketSide. Feature-gated + quotas. Learn more in [PUBLIC-UNLIMITED.md](docs/licensing/PUBLIC-UNLIMITED.md) and [PRIVATE-LIMITED.md](docs/licensing/PRIVATE-LIMITED.md).
 
 **PUBLIC KEY IS FREE, PRIVATE KEY IS MONETIZED**
+
+### 🌊 Commons Charter
+
+SeaTrace is committed to **keeping SeaSide, DeckSide, and DockSide free forever** as a public good. Our [Commons Charter](docs/COMMONS_CHARTER.md) guarantees:
+
+✅ **No Retroactive Paywalls** - Free endpoints stay free  
+✅ **Transparent Funding** - 10-15% of MarketSide revenue funds free infrastructure  
+✅ **Monthly Reporting** - Public Commons Fund metrics at `/api/commons/fund`  
+✅ **Community Governance** - 90-day notice for any scope changes  
+
+**How it works:** MarketSide subscriptions cross-subsidize free pillar infrastructure. See real-time Commons Fund coverage at our [transparency dashboard](https://metrics.seatrace.worldseafoodproducers.com/commons).
 
 | Component | License Type | Access Level | Commercial Use |
 |-----------|-------------|--------------|----------------|

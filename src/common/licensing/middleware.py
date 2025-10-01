@@ -5,10 +5,9 @@ and enforces scope restrictions to prevent unauthorized access to premium featur
 """
 
 import base64
-import hashlib
 import json
 import time
-from typing import Optional, Set
+from typing import Dict, Optional, Set
 
 import structlog
 from fastapi import HTTPException, Request
@@ -22,63 +21,23 @@ except ImportError:
 
 logger = structlog.get_logger()
 
-# Public verification key (base64-encoded Ed25519 public key)
-# Replace with actual key from SeaTrace licensing authority
-PUB_VERIFY_KEY_B64 = "REPLACE_WITH_BASE64_ED25519_VERIFY_KEY"
-
 
 class LicenseValidationError(Exception):
     """Raised when license validation fails."""
     pass
 
 
-def verify_ed25519_jws(token: str, verify_key_b64: str) -> dict:
-    """Verify Ed25519 JWS token and extract payload.
+def _b64url_decode(s: str) -> bytes:
+    """Decode base64url string with proper padding.
     
     Args:
-        token: JWS compact serialization (header.payload.signature)
-        verify_key_b64: Base64-encoded Ed25519 public key
+        s: Base64url encoded string
         
     Returns:
-        Decoded payload dictionary
-        
-    Raises:
-        LicenseValidationError: If signature verification fails
+        Decoded bytes
     """
-    try:
-        # Split JWS compact format
-        parts = token.split(".")
-        if len(parts) != 3:
-            raise LicenseValidationError("Invalid JWS format")
-        
-        h64, p64, s64 = parts
-        
-        # Reconstruct signed message
-        msg = f"{h64}.{p64}".encode()
-        
-        # Decode signature (add padding if needed)
-        sig = base64.urlsafe_b64decode(s64 + "==")
-        
-        # Verify signature
-        verify_key = nacl.signing.VerifyKey(base64.b64decode(verify_key_b64))
-        verify_key.verify(msg, sig)
-        
-        # Decode header and payload
-        header = json.loads(base64.urlsafe_b64decode(h64 + "=="))
-        payload = json.loads(base64.urlsafe_b64decode(p64 + "=="))
-        
-        logger.info("license_verified", 
-                   license_type=payload.get("typ"),
-                   license_id=payload.get("license_id"))
-        
-        return payload
-        
-    except nacl.exceptions.BadSignatureError:
-        logger.error("license_signature_invalid")
-        raise LicenseValidationError("Invalid license signature")
-    except Exception as e:
-        logger.error("license_verification_failed", error=str(e))
-        raise LicenseValidationError(f"License verification failed: {e}")
+    pad = '=' * (-len(s) % 4)
+    return base64.urlsafe_b64decode(s + pad)
 
 
 class LicenseMiddleware(BaseHTTPMiddleware):
@@ -96,6 +55,7 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         public_routes: list[str],
         verify_key: Optional[str] = None,
         crl_url: Optional[str] = None,
+        verify_keys_by_kid: Optional[Dict[str, str]] = None,
     ):
         """Initialize license middleware.
         
@@ -103,13 +63,15 @@ class LicenseMiddleware(BaseHTTPMiddleware):
             app: FastAPI application
             public_scope_digest: SHA-256 digest of allowed public routes
             public_routes: List of route signatures allowed under PUL
-            verify_key: Base64-encoded Ed25519 public key (optional)
+            verify_key: Base64-encoded Ed25519 public key (default)
             crl_url: Certificate Revocation List URL (optional)
+            verify_keys_by_kid: Dict of kid -> verify_key for rotation
         """
         super().__init__(app)
         self.public_digest = public_scope_digest
         self.public_routes: Set[str] = set(public_routes)
-        self.verify_key = verify_key or PUB_VERIFY_KEY_B64
+        self.verify_key = verify_key
+        self.verify_keys_by_kid = verify_keys_by_kid or {}
         self.crl_url = crl_url
         self._crl_cache: Optional[dict] = None
         self._crl_cache_time: float = 0
@@ -130,8 +92,12 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         # Derive route signature "METHOD:/path"
         route_sig = f"{request.method}:{request.url.path}"
         
-        # Get license token from header
+        # Get license token from header or Authorization Bearer
         lic_token = request.headers.get("x-st-license", "")
+        if not lic_token and "authorization" in request.headers:
+            auth = request.headers.get("authorization", "")
+            if auth.startswith("Bearer "):
+                lic_token = auth.split("Bearer ")[-1]
         
         # No token: allow only public routes
         if not lic_token:
@@ -143,9 +109,9 @@ class LicenseMiddleware(BaseHTTPMiddleware):
                 )
             return await call_next(request)
         
-        # Verify token signature
+        # Verify token signature with kid support
         try:
-            payload = verify_ed25519_jws(lic_token, self.verify_key)
+            header, payload = self._verify_jws(lic_token)
         except LicenseValidationError as e:
             raise HTTPException(status_code=401, detail=str(e))
         
@@ -167,7 +133,7 @@ class LicenseMiddleware(BaseHTTPMiddleware):
             
         elif typ == "PL":
             # Private Limited License
-            await self._validate_pl(payload, route_sig)
+            await self._validate_pl(request, payload, route_sig)
             
         else:
             logger.error("license_type_unsupported", type=typ)
@@ -179,7 +145,75 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         # Attach license claims to request state
         request.state.license_claims = payload
         
-        return await call_next(request)
+        # Add license headers to response
+        response = await call_next(request)
+        response.headers["X-License-Type"] = payload.get("typ", "unknown")
+        response.headers["X-License-Id"] = payload.get("license_id", "")
+        response.headers["X-License-Org"] = payload.get("org", "")
+        if payload.get("tier"):
+            response.headers["X-License-Tier"] = payload.get("tier")
+        
+        # Add quota warning if present
+        if hasattr(request.state, "quota_warning"):
+            response.headers["X-Quota-Warning"] = request.state.quota_warning
+        
+        return response
+    
+    def _verify_jws(self, token: str) -> tuple[dict, dict]:
+        """Verify JWS token with kid support.
+        
+        Args:
+            token: JWS compact serialization
+            
+        Returns:
+            Tuple of (header, payload)
+            
+        Raises:
+            LicenseValidationError: If verification fails
+        """
+        parts = token.split(".")
+        if len(parts) != 3:
+            raise LicenseValidationError("Invalid token format")
+        
+        h64, p64, s64 = parts
+        
+        # Decode and validate header
+        header = json.loads(_b64url_decode(h64))
+        if header.get("alg") not in ("EdDSA", "Ed25519"):
+            raise LicenseValidationError(
+                f"Unsupported alg; require EdDSA/Ed25519, got {header.get('alg')}"
+            )
+        
+        # Get verify key by kid
+        kid = header.get("kid")
+        verify_key_b64 = self.verify_keys_by_kid.get(kid) or self.verify_key
+        if not verify_key_b64:
+            raise LicenseValidationError(f"Unknown key id (kid): {kid}")
+        
+        # Verify signature
+        message = f"{h64}.{p64}".encode()
+        signature = _b64url_decode(s64)
+        
+        try:
+            verify_key = nacl.signing.VerifyKey(base64.b64decode(verify_key_b64))
+            verify_key.verify(message, signature)
+        except nacl.exceptions.BadSignatureError:
+            raise LicenseValidationError("Invalid license signature")
+        
+        # Decode payload
+        payload = json.loads(_b64url_decode(p64))
+        
+        # Check expiry
+        exp = payload.get("exp", 0)
+        if exp and time.time() > exp:
+            raise LicenseValidationError("License expired")
+        
+        logger.info("license_verified",
+                   license_type=payload.get("typ"),
+                   license_id=payload.get("license_id"),
+                   kid=kid)
+        
+        return header, payload
     
     async def _validate_pul(self, payload: dict, route_sig: str):
         """Validate Public Unlimited License.
@@ -218,10 +252,11 @@ class LicenseMiddleware(BaseHTTPMiddleware):
                 detail="License expired"
             )
     
-    async def _validate_pl(self, payload: dict, route_sig: str):
+    async def _validate_pl(self, request: Request, payload: dict, route_sig: str):
         """Validate Private Limited License.
         
         Args:
+            request: FastAPI request object
             payload: Decoded license token payload
             route_sig: Route signature (METHOD:/path)
             
@@ -232,24 +267,25 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         exp = payload.get("exp", 0)
         grace_period = 14 * 24 * 3600  # 14 days
         
-        if time.time() > exp:
-            if time.time() > exp + grace_period:
-                logger.error("pl_expired", license_id=payload.get("license_id"))
-                raise HTTPException(
-                    status_code=403,
-                    detail="License expired"
-                )
-            else:
-                # In grace period - allow but warn
-                logger.warning("pl_grace_period",
-                              license_id=payload.get("license_id"),
-                              days_remaining=int((exp + grace_period - time.time()) / 86400))
+        if exp and time.time() > exp + grace_period:
+            logger.error("pl_expired_beyond_grace",
+                        license_id=payload.get("license_id"))
+            raise HTTPException(
+                status_code=403,
+                detail="License expired (beyond grace period)"
+            )
+        elif exp and time.time() > exp:
+            # In grace period - allow but warn
+            days_remaining = int((exp + grace_period - time.time()) / 86400)
+            logger.warning("pl_grace_period",
+                          license_id=payload.get("license_id"),
+                          days_remaining=days_remaining)
         
         # Check domain binding (if specified)
         domain_bind = payload.get("domain_bind", [])
         if domain_bind:
-            host = request.headers.get("host", "").split(":")[0]
-            if host not in domain_bind:
+            host = request.headers.get("host", "").split(":")[0].lower()
+            if host not in [d.lower() for d in domain_bind]:
                 logger.error("pl_domain_mismatch",
                             expected=domain_bind,
                             actual=host)

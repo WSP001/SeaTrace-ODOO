@@ -123,12 +123,29 @@ def require_feature(feature: str):
     return decorator
 
 
+def _period_key(prefix: str, license_id: str, metric: str) -> str:
+    """Generate monthly period key for quota tracking.
+    
+    Args:
+        prefix: Key prefix (e.g., 'quota')
+        license_id: License identifier
+        metric: Metric name (e.g., 'qr_scans')
+        
+    Returns:
+        Period key with YYYYMM suffix
+    """
+    from datetime import datetime, timezone
+    now = datetime.now(timezone.utc)
+    return f"{prefix}:{license_id}:{metric}:{now:%Y%m}"
+
+
 async def enforce_quota(
     request: Request,
     meter: dict,
     key: str,
     cost: int = 1,
-    redis_client: Optional[object] = None
+    redis_client: Optional[object] = None,
+    idempotency_key: Optional[str] = None
 ) -> None:
     """Enforce usage quota for a specific resource.
     
@@ -160,16 +177,34 @@ async def enforce_quota(
         # Unlimited for this dimension
         return
     
-    # Get current usage
+    # Get current usage with monthly period
     if redis_client:
-        # Distributed metering via Redis
-        meter_key = f"quota:{license_id}:{key}"
-        used = int(await redis_client.get(meter_key) or 0)
+        # Distributed metering via Redis with monthly buckets
+        bucket = _period_key("quota", license_id, key)
+        
+        # Check idempotency to avoid double-counting
+        if idempotency_key:
+            idem_key = f"idem:{bucket}"
+            seen = await redis_client.sadd(idem_key, idempotency_key)
+            if not seen:
+                # Duplicate request - don't meter twice
+                logger.info("idempotent_request_skipped",
+                          license_id=license_id,
+                          key=key,
+                          idempotency_key=idempotency_key)
+                return
+            await redis_client.expire(idem_key, 86400 * 40)  # 40 days
+        
+        used = int(await redis_client.get(bucket) or 0)
         new_usage = used + cost
-        await redis_client.set(meter_key, new_usage)
-        await redis_client.expire(meter_key, 86400 * 31)  # 31 days TTL
+        
+        # Use pipeline for atomic update
+        pipe = redis_client.pipeline()
+        pipe.set(bucket, new_usage)
+        pipe.expire(bucket, 86400 * 40)  # 40 days (>= 1 month)
+        await pipe.execute()
     else:
-        # In-memory metering
+        # In-memory metering (not recommended for production)
         used = meter.get(key, 0)
         new_usage = used + cost
         meter[key] = new_usage
