@@ -57,6 +57,10 @@ The **SeaTrace-ODOO Enterprise Integration Suite** combines SeaTrace's blockchai
 
 ## 🔐 Dual Licensing Strategy
 
+> **Licensing at a glance:**  
+> • **Free public modules (PUL):** [SeaSide/DeckSide/DockSide scope & token](docs/licensing/PUBLIC-UNLIMITED.md)  
+> • **Monetized MarketSide (PL):** [Entitlements & pricing](docs/licensing/PRIVATE-LIMITED.md)
+
 **PUBLIC KEY IS FREE, PRIVATE KEY IS MONETIZED**
 
 | Component | License Type | Access Level | Commercial Use |
