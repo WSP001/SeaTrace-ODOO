@@ -261,10 +261,17 @@ trade_result = sdk.marketside.process_trade({
 
 ## 📚 Documentation
 
+### Technical Documentation
 - [Integration Guide](docs/integration-guides/odoo-setup.md)
 - [API Reference](docs/api-reference/seatrace-api.md)
-- [Business Case](docs/business-case.md)
 - [Deployment Guide](docs/deployment-guide.md)
+
+### Business & Marketing
+- [Public Functional Overview](docs/marketing/public-overview.md) - Stakeholder-friendly technical summary
+- [Business Case](docs/marketing/business-case.md) - Value proposition and ROI analysis
+- [Investor Overview](docs/marketing/investor-overview.md) - Investment opportunity summary
+
+> **Note:** This repository contains only public-facing functional summaries. Advanced trading algorithms, proprietary pricing logic, and monetized module implementations are excluded for security and competitive reasons.
 
 ---
 
