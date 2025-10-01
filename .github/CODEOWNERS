@@ -1,0 +1,14 @@
+# SeaTrace-ODOO Public Repo Code Owners
+# Prevent accidental leakage of sensitive files
+
+# Default owners
+* @wsp-security @seatrace-ops
+
+# Verify keys (public, but require review)
+/docs/licensing/verify-keys.json @seatrace-ops
+
+# Block these paths in public repo (should only be in private)
+/src/emr/** @wsp-security @seatrace-ops
+/src/marketside/licensing/entitlements.py @wsp-security @seatrace-ops
+/docs/licensing/PRIVATE-LIMITED.md @wsp-leadership
+/docs/marketing/INVESTOR_PROSPECTUS.md @wsp-leadership

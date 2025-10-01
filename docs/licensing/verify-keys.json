@@ -1,0 +1,11 @@
+{
+  "emr-pricing-2025": {
+    "kid": "emr-pricing-2025",
+    "verify_key_b64": "REPLACE_WITH_BASE64_ED25519_PUBLIC_KEY",
+    "purpose": "EMR pricing card signature verification",
+    "algorithm": "Ed25519",
+    "valid_from": "2025-01-01T00:00:00Z",
+    "valid_until": null,
+    "status": "active"
+  }
+}
