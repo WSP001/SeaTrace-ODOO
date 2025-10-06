@@ -1,0 +1,48 @@
+# SeaTrace Commons Charter - PUBLIC Dependencies
+# Foundation for open-source seafood traceability
+# Last updated: 2025-10-06
+
+# === CORE API FRAMEWORK ===
+fastapi>=0.109.0,<0.110.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.5.3,<3.0.0
+pydantic-settings>=2.1.0
+
+# === DATABASE ===
+alembic>=1.13.1,<2.0.0
+psycopg2-binary>=2.9.9
+sqlalchemy>=2.0.25
+
+# === AUTHENTICATION (Basic) ===
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# === API DOCUMENTATION ===
+python-multipart>=0.0.6
+email-validator>=2.1.0
+
+# === MONITORING & OBSERVABILITY ===
+prometheus-client>=0.19.0
+python-json-logger>=2.0.7
+
+# === DEVELOPMENT TOOLS ===
+debugpy>=1.8.0
+pytest>=7.4.4
+pytest-asyncio>=0.21.1
+pytest-cov>=4.1.0
+httpx>=0.26.0
+
+# === CODE QUALITY ===
+ruff>=0.1.14
+black>=24.1.1
+isort>=5.13.2
+mypy>=1.8.0
+
+# === SECURITY ===
+bandit>=1.7.6
+safety>=3.0.1
+
+# === UTILITIES ===
+python-dotenv>=1.0.0
+click>=8.1.7
+rich>=13.7.0
