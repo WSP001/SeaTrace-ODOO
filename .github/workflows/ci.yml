@@ -5,8 +5,8 @@ on:
     branches: [ main ]
   push:
     branches: 
-      - feat/licensing-phase-1.5A
-      - feat/licensing-phase-1.5B
+      - 'feat/licensing-phase-1.5A*'  # Matches -4pillars suffix
+      - 'feat/licensing-phase-1.5B*'
 
 jobs:
   test:
