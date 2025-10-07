@@ -4,9 +4,11 @@ This middleware validates license tokens (PUL and PL) using Ed25519 signatures
 and enforces scope restrictions to prevent unauthorized access to premium features.
 """
 
+import asyncio
 import base64
 import json
 import time
+import uuid
 from typing import Dict, Optional, Set
 
 import structlog
@@ -89,6 +91,10 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         Raises:
             HTTPException: If license validation fails
         """
+        # Generate or extract correlation ID for distributed tracing
+        correlation_id = request.headers.get("X-Correlation-ID") or str(uuid.uuid4())
+        log = structlog.get_logger().bind(correlation_id=correlation_id)
+        
         # Derive route signature "METHOD:/path"
         route_sig = f"{request.method}:{request.url.path}"
         
@@ -111,7 +117,7 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         
         # Verify token signature with kid support
         try:
-            header, payload = self._verify_jws(lic_token)
+            header, payload = await self._verify_jws(lic_token)
         except LicenseValidationError as e:
             raise HTTPException(status_code=401, detail=str(e))
         
@@ -147,6 +153,7 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         
         # Add license headers to response
         response = await call_next(request)
+        response.headers["X-Correlation-ID"] = correlation_id
         response.headers["X-License-Type"] = payload.get("typ", "unknown")
         response.headers["X-License-Id"] = payload.get("license_id", "")
         response.headers["X-License-Org"] = payload.get("org", "")
@@ -159,7 +166,7 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         
         return response
     
-    def _verify_jws(self, token: str) -> tuple[dict, dict]:
+    async def _verify_jws(self, token: str) -> tuple[dict, dict]:
         """Verify JWS token with kid support.
         
         Args:
@@ -190,14 +197,23 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         if not verify_key_b64:
             raise LicenseValidationError(f"Unknown key id (kid): {kid}")
         
-        # Verify signature
+        # Verify signature (constant-time to prevent timing attacks)
         message = f"{h64}.{p64}".encode()
         signature = _b64url_decode(s64)
         
         try:
             verify_key = nacl.signing.VerifyKey(base64.b64decode(verify_key_b64))
             verify_key.verify(message, signature)
+            valid = True
         except nacl.exceptions.BadSignatureError:
+            valid = False
+        
+        # Constant-time delay to prevent timing attacks
+        # Ed25519 verification is already constant-time, but exception
+        # handling adds timing variance. Add small delay to normalize.
+        await asyncio.sleep(0.001)  # 1ms constant delay (async-safe)
+        
+        if not valid:
             raise LicenseValidationError("Invalid license signature")
         
         # Decode payload
