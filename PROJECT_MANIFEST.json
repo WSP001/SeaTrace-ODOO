@@ -1,0 +1,95 @@
+{
+  "version": "1.0.0",
+  "project": "SeaTrace-ODOO",
+  "type": "public",
+  "description": "Maritime tracking platform - Commons Charter implementation",
+  "website": "https://worldseafoodproducers.com",
+  "paths": {
+    "root": "C:/Users/Roberto002/Documents/GitHub/SeaTrace-ODOO",
+    "src": "src",
+    "tests": "tests",
+    "docs": "docs",
+    "scripts": "scripts"
+  },
+  "services": [
+    {
+      "name": "seaside",
+      "port": 8000,
+      "description": "Vessel tracking and quota management (PUBLIC)",
+      "entry": "src.seaside.main:app",
+      "tier": "free"
+    },
+    {
+      "name": "deckside",
+      "port": 8001,
+      "description": "Catch recording and species tracking (PUBLIC)",
+      "entry": "src.deckside.main:app",
+      "tier": "free"
+    },
+    {
+      "name": "dockside",
+      "port": 8002,
+      "description": "Cold storage and port logistics (PUBLIC)",
+      "entry": "src.dockside.main:app",
+      "tier": "free"
+    }
+  ],
+  "docs": [
+    "CODE.AGENT.md",
+    "PROJECT.AGENT.md",
+    "PROJECT_MANIFEST.json",
+    "README.md",
+    "CONTRIBUTING.md"
+  ],
+  "security": {
+    "publicKeysOnly": true,
+    "secretsManagement": "environment variables (never commit)",
+    "auditLogging": true,
+    "preCommitHooks": "planned"
+  },
+  "dependencies": {
+    "python": "3.11+",
+    "framework": "FastAPI",
+    "database": "PostgreSQL",
+    "cache": "Redis (optional)",
+    "monitoring": "Prometheus + Grafana (planned)"
+  },
+  "relatedRepos": {
+    "private": {
+      "name": "SeaTrace003",
+      "url": "https://github.com/WSP001/SeaTrace003",
+      "description": "PRIVATE enterprise features (EMR, pricing, billing)"
+    },
+    "dev": {
+      "name": "SeaTrace002",
+      "url": "https://github.com/WSP001/SeaTrace002",
+      "description": "Development/legacy repository"
+    }
+  },
+  "commonsCharter": {
+    "freeTier": {
+      "name": "PUL (Public Unlimited License)",
+      "features": [
+        "Unlimited vessel tracking",
+        "Unlimited catch recording",
+        "Basic cold storage tracking",
+        "Community support"
+      ],
+      "restrictions": [
+        "No advanced analytics",
+        "No EMR metering",
+        "No priority support"
+      ]
+    },
+    "revenueSharingPercentage": "10-15%",
+    "transparencyEndpoint": "/api/commons/fund",
+    "publicAccountability": true,
+    "reportingUrl": "https://worldseafoodproducers.com/commons/report"
+  },
+  "licensing": {
+    "model": "Commons Charter + PUL",
+    "verification": "JWK/JWS (public keys in this repo)",
+    "signing": "Ed25519 (private keys in SeaTrace003)",
+    "revocation": "Bloom filter CRL (10,000x faster)"
+  }
+}
