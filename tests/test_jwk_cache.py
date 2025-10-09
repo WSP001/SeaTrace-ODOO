@@ -15,6 +15,22 @@ from pathlib import Path
 import pytest
 
 
+def create_test_keys_file(tmp_path, keys_data):
+    """
+    Helper to create test verify-keys.json file.
+    
+    Args:
+        tmp_path: pytest tmp_path fixture
+        keys_data: Dict with "keys" array
+    
+    Returns:
+        Path to created keys file
+    """
+    keys_file = tmp_path / "verify-keys.json"
+    keys_file.write_text(json.dumps(keys_data))
+    return keys_file
+
+
 def test_jwk_cache_basic_import():
     """Verify JWK cache module imports cleanly."""
     try:
@@ -55,8 +71,7 @@ def test_jwk_cache_returns_key_by_kid(tmp_path):
         ]
     }
     
-    keys_file = tmp_path / "verify-keys.json"
-    keys_file.write_text(json.dumps(keys))
+    keys_file = create_test_keys_file(tmp_path, keys)
     
     try:
         from src.common.security.jwk_cache import JWKCache
@@ -111,8 +126,7 @@ def test_jwk_cache_unknown_kid_handling(tmp_path):
         ]
     }
     
-    keys_file = tmp_path / "verify-keys.json"
-    keys_file.write_text(json.dumps(keys))
+    keys_file = create_test_keys_file(tmp_path, keys)
     
     try:
         from src.common.security.jwk_cache import JWKCache
@@ -164,8 +178,7 @@ def test_jwk_cache_refresh_mechanism(tmp_path):
         ]
     }
     
-    keys_file = tmp_path / "verify-keys.json"
-    keys_file.write_text(json.dumps(keys))
+    keys_file = create_test_keys_file(tmp_path, keys)
     
     try:
         from src.common.security.jwk_cache import JWKCache
