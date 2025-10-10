@@ -1,0 +1,1 @@
+# DockSide ODOO module

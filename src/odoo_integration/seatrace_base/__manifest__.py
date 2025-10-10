@@ -1,0 +1,1 @@
+# ODOO base module manifest
