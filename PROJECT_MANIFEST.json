@@ -1,15 +1,21 @@
 {
-  "version": "1.0.0",
+  "version": "1.0.1",
   "project": "SeaTrace-ODOO",
   "type": "public",
-  "description": "Maritime tracking platform - Commons Charter implementation",
+  "description": "Maritime tracking platform - Commons Charter implementation with packet switching",
   "website": "https://worldseafoodproducers.com",
   "paths": {
     "root": "C:/Users/Roberto002/Documents/GitHub/SeaTrace-ODOO",
     "src": "src",
     "tests": "tests",
     "docs": "docs",
-    "scripts": "scripts"
+    "scripts": "scripts",
+    "packet_switching": "src/packet_switching",
+    "correlation": "src/correlation",
+    "public_keys": "src/public_keys",
+    "building_lot_aggregation": "src/building_lot_aggregation",
+    "odoo_integration": "src/odoo_integration",
+    "public_api": "src/public_api"
   },
   "services": [
     {
@@ -17,29 +23,47 @@
       "port": 8000,
       "description": "Vessel tracking and quota management (PUBLIC)",
       "entry": "src.seaside.main:app",
-      "tier": "free"
+      "tier": "free",
+      "packet_handler": "src.packet_switching.handler:PacketSwitchingHandler"
     },
     {
       "name": "deckside",
       "port": 8001,
       "description": "Catch recording and species tracking (PUBLIC)",
       "entry": "src.deckside.main:app",
-      "tier": "free"
+      "tier": "free",
+      "packet_handler": "src.packet_switching.handler:PacketSwitchingHandler"
     },
     {
       "name": "dockside",
       "port": 8002,
       "description": "Cold storage and port logistics (PUBLIC)",
       "entry": "src.dockside.main:app",
-      "tier": "free"
+      "tier": "free",
+      "packet_handler": "src.packet_switching.handler:PacketSwitchingHandler"
     }
   ],
+  "packet_switching": {
+    "handler": "src.packet_switching.handler:PacketSwitchingHandler",
+    "router": "src.packet_switching.router:PacketRouter"
+  },
+  "public_keys": {
+    "admin": "src.public_keys.admin:PublicKeyAdministrator",
+    "jwk_loader": "src.public_keys.jwk_loader:JWKLoader"
+  },
+  "building_lot_aggregation": {
+    "collector": "src.building_lot_aggregation.collector:BuildingLotCollector"
+  },
   "docs": [
     "CODE.AGENT.md",
     "PROJECT.AGENT.md",
     "PROJECT_MANIFEST.json",
+    "TOOL.AGENT.md",
     "README.md",
-    "CONTRIBUTING.md"
+    "CONTRIBUTING.md",
+    "docs/KEY_MANAGEMENT_ARCHITECTURE.md",
+    "docs/packet_switching/README.md",
+    "docs/packet_switching/TEAM_ASSIGNMENTS.md"
   ],
   "security": {
     "publicKeysOnly": true,
@@ -51,8 +75,34 @@
     "python": "3.11+",
     "framework": "FastAPI",
     "database": "PostgreSQL",
-    "cache": "Redis (optional)",
-    "monitoring": "Prometheus + Grafana (planned)"
+    "cache": "Redis",
+    "monitoring": "Prometheus + Grafana (planned)",
+    "packages": {
+      "fastapi": ">=0.104.0",
+      "uvicorn": ">=0.24.0",
+      "cryptography": ">=41.0.0",
+      "pyjwt": ">=2.8.0",
+      "redis": ">=5.0.1",
+      "pytest": ">=7.4.0",
+      "pytest-asyncio": ">=0.21.0",
+      "httpx": ">=0.25.0"
+    }
+  },
+  "correlation": {
+    "storage": "Redis",
+    "retentionDays": 7,
+    "keyPrefix": "correlation:"
+  },
+  "testing": {
+    "framework": "pytest",
+    "coverage": {
+      "minimum": 80,
+      "target": 90
+    },
+    "testPaths": {
+      "unit": "tests/unit",
+      "integration": "tests/integration"
+    }
   },
   "relatedRepos": {
     "private": {
