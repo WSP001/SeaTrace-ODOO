@@ -4,9 +4,11 @@ This middleware validates license tokens (PUL and PL) using Ed25519 signatures
 and enforces scope restrictions to prevent unauthorized access to premium features.
 """
 
+import asyncio
 import base64
 import json
 import time
+import uuid
 from typing import Dict, Optional, Set
 
 import structlog
@@ -89,6 +91,10 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         Raises:
             HTTPException: If license validation fails
         """
+        # Generate correlation ID for distributed tracing (A2A requirement)
+        correlation_id = request.headers.get("x-correlation-id") or str(uuid.uuid4())
+        request.state.correlation_id = correlation_id
+        
         # Derive route signature "METHOD:/path"
         route_sig = f"{request.method}:{request.url.path}"
         
@@ -102,16 +108,19 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         # No token: allow only public routes
         if not lic_token:
             if route_sig not in self.public_routes:
-                logger.warning("license_required", route=route_sig)
+                logger.warning("license_required", route=route_sig, 
+                             correlation_id=correlation_id)
                 raise HTTPException(
                     status_code=403,
                     detail="License required for this endpoint"
                 )
-            return await call_next(request)
+            response = await call_next(request)
+            response.headers["X-Correlation-Id"] = correlation_id
+            return response
         
         # Verify token signature with kid support
         try:
-            header, payload = self._verify_jws(lic_token)
+            header, payload = await self._verify_jws(lic_token)
         except LicenseValidationError as e:
             raise HTTPException(status_code=401, detail=str(e))
         
@@ -147,6 +156,7 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         
         # Add license headers to response
         response = await call_next(request)
+        response.headers["X-Correlation-Id"] = correlation_id
         response.headers["X-License-Type"] = payload.get("typ", "unknown")
         response.headers["X-License-Id"] = payload.get("license_id", "")
         response.headers["X-License-Org"] = payload.get("org", "")
@@ -159,7 +169,7 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         
         return response
     
-    def _verify_jws(self, token: str) -> tuple[dict, dict]:
+    async def _verify_jws(self, token: str) -> tuple[dict, dict]:
         """Verify JWS token with kid support.
         
         Args:
@@ -194,19 +204,37 @@ class LicenseMiddleware(BaseHTTPMiddleware):
         message = f"{h64}.{p64}".encode()
         signature = _b64url_decode(s64)
         
+        # Timing attack mitigation: constant-time verification
+        verification_error = None
         try:
             verify_key = nacl.signing.VerifyKey(base64.b64decode(verify_key_b64))
             verify_key.verify(message, signature)
-        except nacl.exceptions.BadSignatureError:
+        except nacl.exceptions.BadSignatureError as e:
+            verification_error = e
+        
+        # Add small async sleep to reduce timing variance (timing attack mitigation)
+        await asyncio.sleep(0.001)  # 1ms constant delay
+        
+        if verification_error:
             raise LicenseValidationError("Invalid license signature")
         
         # Decode payload
         payload = json.loads(_b64url_decode(p64))
         
-        # Check expiry
+        # Check expiry (with grace period for PL licenses)
         exp = payload.get("exp", 0)
+        typ = payload.get("typ")
+        
         if exp and time.time() > exp:
-            raise LicenseValidationError("License expired")
+            # PL licenses have a 14-day grace period
+            if typ == "PL":
+                grace_period = 14 * 24 * 3600
+                if time.time() > exp + grace_period:
+                    raise LicenseValidationError("License expired (beyond grace period)")
+                # Within grace period - allow but will be logged in _validate_pl
+            else:
+                # PUL and other licenses have no grace period
+                raise LicenseValidationError("License expired")
         
         logger.info("license_verified",
                    license_type=payload.get("typ"),
