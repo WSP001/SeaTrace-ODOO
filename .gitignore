@@ -1,25 +1,17 @@
-# Keys & Tokens (CRITICAL - DO NOT COMMIT)
-keys/
-*.token
-*.key
-*.pub
-.env
-.env.*
-
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
+*.class
 *.so
 .Python
 env/
 venv/
-*.egg-info/
+.venv/
 
-# ODOO
-*.pyc
-*.pyo
-.installed.cfg
+# Environment variables
+.env
+.env.local
+.env.*.local
 
 # IDE
 .vscode/
@@ -27,29 +19,12 @@ venv/
 *.swp
 *.swo
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Private keys and configs (DO NOT COMMIT)
-*.key
-*.pem
-config/production/
-secrets/
-private_keys/
-.env
-.env.local
-.env.production
-
-# Build artifacts
-dist/
-build/
-*.egg
-
 # Testing
 .pytest_cache/
 .coverage
 htmlcov/
 
-# Documentation builds
-docs/_build/
+# Build
+dist/
+build/
+*.egg-info/
