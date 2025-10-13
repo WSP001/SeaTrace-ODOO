@@ -2,38 +2,21 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
 .Python
 env/
 venv/
 .venv/
-
-# Environment variables
 .env
-.env.local
-.env.*.local
-
-# IDE
+.env.*
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# Testing
 .pytest_cache/
 .coverage
 htmlcov/
-
-# Build
 dist/
 build/
 *.egg-info/
-
-# Logs
 *.log
 logs/
-
-# Database
 *.db
-*.sqlite
-*.sqlite3
+*.sqlite*
