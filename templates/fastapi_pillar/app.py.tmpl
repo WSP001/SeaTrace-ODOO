@@ -1,0 +1,104 @@
+# {{MODULE}}.py — SeaTrace {{SERVICE|capitalize}} ({{ROLE}})
+# For the Commons Good! 🌊
+
+from fastapi import FastAPI, Depends, Header, HTTPException
+from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+from starlette.responses import Response, JSONResponse
+import time
+import os
+
+PILLAR = os.getenv("PILLAR", "{{SERVICE}}")
+PILLAR_ROLE = os.getenv("PILLAR_ROLE", "{{ROLE}}")
+SERVICE = f"seatrace_{PILLAR}"
+
+app = FastAPI(
+    title=f"SeaTrace {PILLAR.capitalize()} ({PILLAR_ROLE})",
+    version="0.1.0",
+    description=f"{PILLAR_ROLE} operations for SeaTrace"
+)
+
+# --- Prometheus metrics ---
+REQ_COUNTER = Counter(
+    f"{SERVICE}_requests_total",
+    "Total requests",
+    ["path", "method", "code"]
+)
+LATENCY = Histogram(
+    f"{SERVICE}_request_seconds",
+    "Request latency",
+    ["path", "method"]
+)
+HEALTH = Gauge(
+    f"{SERVICE}_health",
+    "Health status (1=ok, 0=down)"
+)
+
+# --- JWT placeholder ---
+def require_jwt(authorization: str = Header(None)):
+    """JWT validation - TODO: wire to security.rbac"""
+    if authorization is None or not authorization.startswith("Bearer "):
+        raise HTTPException(401, "Missing token")
+    # TODO: verify JWS / CRL per DeckSide rules
+    return authorization.split(" ", 1)[1]
+
+@app.middleware("http")
+async def metrics_middleware(request, call_next):
+    """Track request metrics"""
+    start = time.perf_counter()
+    response = await call_next(request)
+    duration = time.perf_counter() - start
+    
+    LATENCY.labels(request.url.path, request.method).observe(duration)
+    REQ_COUNTER.labels(request.url.path, request.method, str(response.status_code)).inc()
+    
+    return response
+
+@app.get("/health")
+async def health():
+    """Health check endpoint"""
+    HEALTH.set(1.0)
+    return {
+        "pillar": PILLAR,
+        "role": PILLAR_ROLE,
+        "status": "ok",
+        "service": SERVICE
+    }
+
+@app.get("/metrics")
+async def metrics():
+    """Prometheus metrics endpoint"""
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+# --- Pillar-specific endpoints (customize per role) ---
+@app.post("/ingest/packet")
+async def ingest_packet(packet: dict, token: str = Depends(require_jwt)):
+    """Ingest data packet - TODO: crypto_handler2 verify"""
+    # TODO: Ed25519 signature verify, hash, timestamp
+    return {
+        "ok": True,
+        "pillar": PILLAR,
+        "accepted": True,
+        "packet_id": packet.get("id", "unknown")
+    }
+
+@app.get("/kpi")
+async def kpi_preview():
+    """KPI preview - TODO: wire DockSide aggregates"""
+    return {
+        "transparency": 0.0,
+        "compliance": 0.0,
+        "equity": 0.0,
+        "climate": 0.0,
+        "pillar": PILLAR
+    }
+
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {
+        "pillar": PILLAR,
+        "role": PILLAR_ROLE,
+        "service": SERVICE,
+        "version": "0.1.0",
+        "endpoints": ["/health", "/metrics", "/ingest/packet", "/kpi"]
+    }

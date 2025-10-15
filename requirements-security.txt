@@ -1,0 +1,32 @@
+# 🛡️ SeaTrace Security Dependencies
+# For the Commons Good! 🌊
+
+# Layer 1: Rate Limiting
+slowapi==0.1.9
+redis==5.0.1
+
+# Layer 2: Input Validation
+pydantic==2.5.0
+
+# Layer 3-4: Timing & Replay Defense
+# (uses standard library: hmac, asyncio, secrets)
+
+# Layer 5: Secret Management
+cryptography==41.0.7
+
+# Layer 6: TLS Configuration
+# (uses standard library: ssl)
+
+# Layer 7: CRL Validation
+httpx==0.27.0
+
+# Layer 8: RBAC
+# (uses standard library: enum, functools)
+
+# Core FastAPI (if not already installed)
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Additional utilities
+python-dotenv==1.0.0

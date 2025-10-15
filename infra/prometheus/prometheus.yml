@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+
+scrape_configs:
+  - job_name: seaside
+    static_configs:
+      - targets: ["seaside:8001"]
+        labels:
+          pillar: "HOLD"
+    metrics_path: /metrics
+
+  - job_name: deckside
+    static_configs:
+      - targets: ["deckside:8002"]
+        labels:
+          pillar: "RECORD"
+    metrics_path: /metrics
+
+  - job_name: dockside
+    static_configs:
+      - targets: ["dockside:8003"]
+        labels:
+          pillar: "STORE"
+    metrics_path: /metrics
+
+  - job_name: marketside
+    static_configs:
+      - targets: ["marketside:8004"]
+        labels:
+          pillar: "EXCHANGE"
+    metrics_path: /metrics

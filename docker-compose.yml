@@ -1,0 +1,154 @@
+version: '3.8'
+
+networks:
+  seatrace-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  redis-data:
+  prometheus-data:
+  grafana-data:
+
+services:
+  # PILLAR 1: SeaSide (QB - HOLD)
+  seaside:
+    build:
+      context: .
+      dockerfile: services/seaside/Dockerfile
+    container_name: seatrace-seaside
+    restart: unless-stopped
+    networks: [seatrace-net]
+    ports: ["8001:8001"]
+    environment:
+      - DATABASE_URL=postgresql://seatrace:${DB_PASSWORD:-changeme}@postgres:5432/seatrace
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret}
+    depends_on: [postgres, redis]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+    profiles: [seaside, all]
+
+  # PILLAR 2: DeckSide (RB - RECORD)
+  deckside:
+    build:
+      context: .
+      dockerfile: services/deckside/Dockerfile
+    container_name: seatrace-deckside
+    restart: unless-stopped
+    networks: [seatrace-net]
+    ports: ["8002:8002"]
+    environment:
+      - DATABASE_URL=postgresql://seatrace:${DB_PASSWORD:-changeme}@postgres:5432/seatrace
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret}
+    depends_on: [postgres, redis]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+    profiles: [deckside, all]
+
+  # PILLAR 3: DockSide (TE - STORE)
+  dockside:
+    build:
+      context: .
+      dockerfile: services/dockside/Dockerfile
+    container_name: seatrace-dockside
+    restart: unless-stopped
+    networks: [seatrace-net]
+    ports: ["8003:8003"]
+    environment:
+      - DATABASE_URL=postgresql://seatrace:${DB_PASSWORD:-changeme}@postgres:5432/seatrace
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret}
+    depends_on: [postgres, redis]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+    profiles: [dockside, all]
+
+  # PILLAR 4: MarketSide (WR1 - EXCHANGE)
+  marketside:
+    build:
+      context: .
+      dockerfile: services/marketside/Dockerfile
+    container_name: seatrace-marketside
+    restart: unless-stopped
+    networks: [seatrace-net]
+    ports: ["8004:8004"]
+    environment:
+      - DATABASE_URL=postgresql://seatrace:${DB_PASSWORD:-changeme}@postgres:5432/seatrace
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-dev-secret}
+    depends_on: [postgres, redis]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+    profiles: [marketside, all]
+
+  # GATEWAY (OT - Load Balancer)
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: seatrace-gateway
+    restart: unless-stopped
+    networks: [seatrace-net]
+    ports: ["80:80"]
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on: [seaside, deckside, dockside, marketside]
+    profiles: [all]
+
+  # DATABASE
+  postgres:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: seatrace-postgres
+    restart: unless-stopped
+    networks: [seatrace-net]
+    ports: ["5432:5432"]
+    environment:
+      - POSTGRES_USER=seatrace
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-changeme}
+      - POSTGRES_DB=seatrace
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U seatrace"]
+      interval: 10s
+    profiles: [all]
+
+  # CACHE (FB - Fullback)
+  redis:
+    image: redis:7-alpine
+    container_name: seatrace-redis
+    restart: unless-stopped
+    networks: [seatrace-net]
+    ports: ["6379:6379"]
+    volumes: [redis-data:/data]
+    command: redis-server --appendonly yes --maxmemory 256mb
+    profiles: [all]
+
+  # PROMETHEUS
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: seatrace-prometheus
+    restart: unless-stopped
+    networks: [seatrace-net]
+    ports: ["9090:9090"]
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    profiles: [observability, all]
+
+  # GRAFANA
+  grafana:
+    image: grafana/grafana:latest
+    container_name: seatrace-grafana
+    restart: unless-stopped
+    networks: [seatrace-net]
+    ports: ["3000:3000"]
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    volumes: [grafana-data:/var/lib/grafana]
+    depends_on: [prometheus]
+    profiles: [observability, all]
