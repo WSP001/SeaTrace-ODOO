@@ -21,6 +21,8 @@ dependencies = [
     "httpx>=0.25.0",
     "prometheus-client>=0.19.0",
     "python-multipart>=0.0.6",
+    "redis>=5.0.1",         # Async Redis client for Bloom CRL & rate limiting
+    "pybloom-live>=4.0.0",  # Bloom filter for 10,000x faster CRL checks
 ]
 
 [project.optional-dependencies]
