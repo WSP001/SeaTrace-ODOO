@@ -63,3 +63,11 @@ bcrypt==4.1.2
 structlog>=23.2.0
 motor>=3.3.2
 pymongo[srv]>=4.6.1
+
+# Proceeding Master Cryptography (from SeaTrace002)
+cryptography==42.0.2
+python-jose[cryptography]>=3.3.0
+bcrypt==4.1.2
+structlog>=23.2.0
+motor>=3.3.2
+pymongo[srv]>=4.6.1
