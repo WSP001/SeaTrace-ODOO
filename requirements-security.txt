@@ -12,7 +12,7 @@ pydantic==2.5.0
 # (uses standard library: hmac, asyncio, secrets)
 
 # Layer 5: Secret Management
-cryptography==41.0.7
+cryptography==44.0.1
 
 # Layer 6: TLS Configuration
 # (uses standard library: ssl)
@@ -26,7 +26,7 @@ httpx==0.27.0
 # Core FastAPI (if not already installed)
 fastapi==0.109.0
 uvicorn[standard]==0.27.0
-python-multipart==0.0.6
+python-multipart==0.0.18
 
 # Additional utilities
 python-dotenv==1.0.0
