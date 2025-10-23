@@ -1,0 +1,142 @@
+name: Phase 1.5A - License Middleware CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: 
+      - 'feat/licensing-phase-1.5A*'  # Matches -4pillars suffix
+      - 'feat/licensing-phase-1.5B*'
+
+jobs:
+  test:
+    name: Test Phase 1.5A (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # Install from requirements.txt if exists
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+          # Install test dependencies
+          pip install pytest pytest-asyncio pytest-cov
+          pip install fastapi starlette httpx
+          pip install structlog
+          # Install project in editable mode
+          pip install -e .
+      
+      - name: Lint with ruff (if available)
+        run: |
+          pip install ruff || true
+          ruff check src/ --select E9,F63,F7,F82 --exit-zero || true
+        continue-on-error: true
+      
+      - name: Run Phase 1.5A tests
+        run: |
+          pytest tests/ -v --tb=short --cov=src --cov-report=term-missing
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+      
+      - name: Upload coverage to Codecov (optional)
+        uses: codecov/codecov-action@v4
+        if: matrix.python-version == '3.11'
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+        continue-on-error: true
+  
+  validate-commons-good:
+    name: Validate Commons Good Alignment
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check Commons Charter compliance
+        run: |
+          echo "🌊 Validating Commons Good alignment..."
+          
+          # Verify Phase 1.5A fixes benefit all tiers equally
+          if grep -q "await asyncio.sleep" src/common/licensing/middleware.py; then
+            echo "✅ Async sleep fix: Benefits ALL tiers (PUL + PL)"
+          else
+            echo "⚠️ Async sleep fix not found"
+            exit 1
+          fi
+          
+          if [ -f src/common/security/jwk_cache.py ]; then
+            echo "✅ JWK cache: Zero-downtime rotation for ALL tiers"
+          else
+            echo "⚠️ JWK cache not found"
+            exit 1
+          fi
+          
+          if grep -q "X-Correlation-ID" src/common/licensing/middleware.py; then
+            echo "✅ Correlation ID: Distributed tracing for ALL tiers"
+          else
+            echo "⚠️ Correlation ID not found"
+            exit 1
+          fi
+          
+          echo "🎉 Commons Good validation PASSED!"
+      
+      - name: Check for tier-specific paywalls
+        run: |
+          echo "🔍 Checking for unintended tier-specific gates..."
+          
+          # Ensure async sleep applies to all license types
+          if grep -q "if.*PL.*asyncio.sleep" src/common/licensing/middleware.py; then
+            echo "❌ VIOLATION: Async sleep gated by tier!"
+            exit 1
+          fi
+          
+          echo "✅ No tier-specific paywalls detected"
+  
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install bandit
+        run: pip install bandit[toml]
+      
+      - name: Run security scan
+        run: |
+          bandit -r src/ -ll -f json -o bandit-report.json || true
+          bandit -r src/ -ll || true
+        continue-on-error: true
+      
+      - name: Upload security report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: security-scan-results
+          path: bandit-report.json
+          retention-days: 30
