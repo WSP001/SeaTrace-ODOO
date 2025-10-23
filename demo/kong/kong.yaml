@@ -1,0 +1,101 @@
+_format_version: "3.0"
+_transform: true
+
+# SeaTrace API Gateway Configuration
+# Routes all Four Pillars + EMR endpoints through unified Kong gateway
+
+services:
+  # EMR Metering Service (Private)
+  - name: emr-service
+    url: http://emr-service:8001
+    routes:
+      - name: emr-api
+        paths:
+          - /api/emr
+        strip_path: false
+        protocols:
+          - http
+          - https
+
+  # SeaSide (HOLD) - Vessel Tracking
+  - name: seaside
+    url: http://seaside:8000
+    routes:
+      - name: seaside-api
+        paths:
+          - /api/v1/seaside
+        strip_path: false
+        protocols:
+          - http
+          - https
+
+  # DeckSide (RECORD) - Catch Verification
+  - name: deckside
+    url: http://deckside:8000
+    routes:
+      - name: deckside-api
+        paths:
+          - /api/v1/deckside
+        strip_path: false
+        protocols:
+          - http
+          - https
+
+  # DockSide (STORE) - Supply Chain Storage
+  - name: dockside
+    url: http://dockside:8000
+    routes:
+      - name: dockside-api
+        paths:
+          - /api/v1/dockside
+        strip_path: false
+        protocols:
+          - http
+          - https
+
+  # MarketSide (EXCHANGE) - Consumer Verification
+  - name: marketside
+    url: http://marketside:8000
+    routes:
+      - name: marketside-api
+        paths:
+          - /api/v1/marketside
+        strip_path: false
+        protocols:
+          - http
+          - https
+
+# Plugins (optional - enable as needed)
+# plugins:
+#   # Rate limiting for public endpoints
+#   - name: rate-limiting
+#     config:
+#       minute: 100
+#       policy: local
+#
+#   # CORS for web clients
+#   - name: cors
+#     config:
+#       origins:
+#         - https://seatrace.worldseafoodproducers.com
+#         - http://localhost:3000
+#       methods:
+#         - GET
+#         - POST
+#         - PUT
+#         - DELETE
+#       headers:
+#         - Authorization
+#         - Content-Type
+#       exposed_headers:
+#         - X-RateLimit-Limit
+#         - X-RateLimit-Remaining
+#       credentials: true
+#       max_age: 3600
+#
+#   # JWT authentication for protected endpoints
+#   - name: jwt
+#     route: emr-api
+#     config:
+#       key_claim_name: kid
+#       secret_is_base64: false

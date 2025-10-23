@@ -1,0 +1,234 @@
+{
+  "dashboard": {
+    "title": "SeaTrace Commons Fund - Investor Demo",
+    "uid": "seatrace-commons-fund",
+    "version": 1,
+    "timezone": "utc",
+    "schemaVersion": 38,
+    "refresh": "1m",
+    "time": {
+      "from": "now-90d",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "type": "gauge",
+        "title": "Current Coverage %",
+        "gridPos": {"x": 0, "y": 0, "w": 8, "h": 6},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT coverage_pct FROM commons_fund_snapshots ORDER BY period DESC LIMIT 1"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 150,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "dark-red"},
+                {"value": 80, "color": "dark-orange"},
+                {"value": 90, "color": "dark-yellow"},
+                {"value": 100, "color": "dark-green"},
+                {"value": 110, "color": "light-green"}
+              ]
+            },
+            "decimals": 1
+          }
+        },
+        "options": {
+          "showThresholdLabels": true,
+          "showThresholdMarkers": true
+        }
+      },
+      {
+        "id": 2,
+        "type": "stat",
+        "title": "Monthly OPEX",
+        "gridPos": {"x": 8, "y": 0, "w": 8, "h": 3},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT opex_usd FROM commons_fund_snapshots ORDER BY period DESC LIMIT 1"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "decimals": 0,
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "type": "stat",
+        "title": "MarketSide Transfer",
+        "gridPos": {"x": 8, "y": 3, "w": 8, "h": 3},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT marketside_xfer_usd FROM commons_fund_snapshots ORDER BY period DESC LIMIT 1"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "decimals": 0,
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "blue"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "type": "stat",
+        "title": "EMR Revenue",
+        "gridPos": {"x": 16, "y": 0, "w": 8, "h": 3},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT emr_revenue_usd FROM commons_fund_snapshots ORDER BY period DESC LIMIT 1"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "decimals": 0,
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "purple"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "type": "stat",
+        "title": "Surplus/Deficit",
+        "gridPos": {"x": 16, "y": 3, "w": 8, "h": 3},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT (marketside_xfer_usd + emr_revenue_usd - opex_usd) as surplus FROM commons_fund_snapshots ORDER BY period DESC LIMIT 1"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "decimals": 0,
+            "color": {"mode": "thresholds"},
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": -10000, "color": "red"},
+                {"value": 0, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "type": "timeseries",
+        "title": "Coverage % Trend",
+        "gridPos": {"x": 0, "y": 6, "w": 12, "h": 8},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "time_series",
+            "rawSql": "SELECT TO_TIMESTAMP(period || '-01', 'YYYY-MM-DD') as time, coverage_pct as value FROM commons_fund_snapshots ORDER BY period"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 20,
+              "lineWidth": 2,
+              "pointSize": 5
+            },
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "transparent"},
+                {"value": 100, "color": "green"}
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "options": {
+          "tooltip": {"mode": "single"},
+          "legend": {"displayMode": "list", "placement": "bottom"}
+        }
+      },
+      {
+        "id": 7,
+        "type": "barchart",
+        "title": "Revenue vs OPEX (Monthly)",
+        "gridPos": {"x": 12, "y": 6, "w": 12, "h": 8},
+        "targets": [
+          {
+            "refId": "OPEX",
+            "format": "time_series",
+            "rawSql": "SELECT TO_TIMESTAMP(period || '-01', 'YYYY-MM-DD') as time, opex_usd as value FROM commons_fund_snapshots ORDER BY period"
+          },
+          {
+            "refId": "Revenue",
+            "format": "time_series",
+            "rawSql": "SELECT TO_TIMESTAMP(period || '-01', 'YYYY-MM-DD') as time, (marketside_xfer_usd + emr_revenue_usd) as value FROM commons_fund_snapshots ORDER BY period"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "decimals": 0
+          }
+        },
+        "options": {
+          "orientation": "horizontal",
+          "showValue": "always",
+          "groupWidth": 0.7
+        }
+      }
+    ],
+    "annotations": {
+      "list": [
+        {
+          "name": "100% Coverage Target",
+          "enable": true,
+          "iconColor": "green",
+          "lineColor": "green",
+          "tags": ["target"],
+          "type": "dashboard"
+        }
+      ]
+    }
+  }
+}

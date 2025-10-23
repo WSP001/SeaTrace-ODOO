@@ -1,0 +1,470 @@
+{
+  "info": {
+    "name": "SeaTrace Investor Demo",
+    "_postman_id": "seatrace-investor-demo-v1",
+    "description": "Complete API testing collection for SeaTrace investor demonstrations. Tests all Five services: EMR metering, SeaSide (HOLD), DeckSide (RECORD), DockSide (STORE), and MarketSide (EXCHANGE).\n\n**Setup Instructions:**\n1. Import environment file: `SeaTrace-INVESTOR.env.json`\n2. Set `emrToken` variable with demo token from private repo\n3. Update `baseUrl` for local (http://localhost:8001) or production (https://seatrace.worldseafoodproducers.com)\n4. Run collection to verify all pillars operational\n\n**Demo Flow:**\n- Start with EMR Pricing Card (shows Ed25519 signature)\n- Query usage by organization (bluewave, pelagic, northstar)\n- Preview invoice to show cost transparency\n- Test each pillar to demonstrate data flow",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{emrToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "EMR Service (Metering)",
+      "description": "Electronic Monitoring & Reporting (EMR) metered service endpoints. Tests pricing transparency, usage queries, and invoice generation.",
+      "item": [
+        {
+          "name": "Get Pricing Card",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/emr/pricing",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emr", "pricing"]
+            },
+            "description": "Retrieve the EMR pricing card with Ed25519 digital signature. Shows transparent cost-plus pricing model with 15-25% gross margin.\n\n**Expected Response:**\n- Ingest: $0.08/min\n- AI Processing: $0.15/min\n- ER Submission: $12.00/report\n- Signature: Ed25519 signed by service\n- Valid-until timestamp"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time < 1s', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(1000);",
+                  "});",
+                  "",
+                  "pm.test('Pricing card has signature', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('signature');",
+                  "    pm.expect(json).to.have.property('valid_until');",
+                  "    pm.expect(json.prices).to.have.property('ingest_min');",
+                  "    pm.expect(json.prices).to.have.property('ai_min');",
+                  "    pm.expect(json.prices).to.have.property('er_submission');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Query Usage by Org",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/emr/usage?org={{org}}&month=2025-10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emr", "usage"],
+              "query": [
+                {
+                  "key": "org",
+                  "value": "{{org}}",
+                  "description": "Organization slug (bluewave, pelagic, northstar)"
+                },
+                {
+                  "key": "month",
+                  "value": "2025-10",
+                  "description": "YYYY-MM format for billing period"
+                }
+              ]
+            },
+            "description": "Query aggregated usage for a specific organization. Returns rollup by meter type showing EM ingest minutes, AI processing minutes, and ER report submissions.\n\n**Demo Organizations:**\n- bluewave: ~94% ER coverage, 5 vessels\n- pelagic: ~94% ER coverage, 5 vessels\n- northstar: ~94% ER coverage, 5 vessels"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Usage has meter breakdowns', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('org');",
+                  "    pm.expect(json).to.have.property('usage');",
+                  "    pm.expect(json.usage).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Preview Invoice",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"org\": \"{{org}}\",\n  \"month\": \"2025-10\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/emr/invoice/preview",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emr", "invoice", "preview"]
+            },
+            "description": "Generate a cost preview for the organization's usage. Shows line-item breakdown by meter type and total amount due.\n\n**Demonstrates:**\n- Transparent pricing\n- No surprise billing\n- Cost-plus model visibility"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Invoice has line items', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('line_items');",
+                  "    pm.expect(json).to.have.property('total_usd');",
+                  "    pm.expect(json.total_usd).to.be.a('number');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Record Usage (Idempotent)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{$guid}}",
+                "description": "Prevents duplicate billing on retry"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"org\": \"{{org}}\",\n  \"meter\": \"ingest_min\",\n  \"value\": 120,\n  \"event_ts\": \"{{$isoTimestamp}}\",\n  \"metadata\": {\n    \"vessel_id\": \"{{vessel_id}}\",\n    \"trip_id\": \"demo-trip-001\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/emr/usage/record",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "emr", "usage", "record"]
+            },
+            "description": "Record a usage event with idempotency key. Used by EMR simulator to stream real-time metrics.\n\n**Meters:**\n- ingest_min: Video ingestion minutes\n- ai_min: AI processing minutes\n- er_submission: Electronic report submissions"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 or 201', () => {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "",
+                  "pm.test('Event recorded', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('recorded');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SeaSide (HOLD)",
+      "description": "Vessel tracking, AIS integration, route analysis, and quality scoring. First pillar in the Four Pillars architecture.",
+      "item": [
+        {
+          "name": "List Vessels",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seaside/vessels?org={{org}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seaside", "vessels"],
+              "query": [
+                {
+                  "key": "org",
+                  "value": "{{org}}"
+                }
+              ]
+            },
+            "description": "List all vessels for the organization. Shows vessel metadata including name, registration, home port, and tracking status."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns vessel array', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('vessels');",
+                  "    pm.expect(json.vessels).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Vessel Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seaside/vessels/{{vessel_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seaside", "vessels", "{{vessel_id}}"]
+            },
+            "description": "Get detailed information about a specific vessel including current location, recent trips, and compliance history."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Vessel has ID and name', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('vessel_id');",
+                  "    pm.expect(json).to.have.property('name');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Calculate Quality Score",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vessel_id\": \"{{vessel_id}}\",\n  \"trip_id\": \"demo-trip-001\",\n  \"metrics\": {\n    \"route_deviation_km\": 2.5,\n    \"speed_violations\": 0,\n    \"area_violations\": 0,\n    \"ais_uptime_pct\": 99.8\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seaside/quality/score",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seaside", "quality", "score"]
+            },
+            "description": "Calculate quality score for a vessel trip based on route compliance, AIS uptime, and regulatory adherence."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "DeckSide (RECORD)",
+      "description": "Catch verification, fish ticket indexing, and landing data validation. Second pillar in the Four Pillars architecture.",
+      "item": [
+        {
+          "name": "List Catches",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/deckside/catches?org={{org}}&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "deckside", "catches"],
+              "query": [
+                {
+                  "key": "org",
+                  "value": "{{org}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "List recent catch landings with species, weight, and verification status. Shows integration with fish ticket systems."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status 200 OK', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Returns catches array', () => {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property('catches');",
+                  "    pm.expect(json.catches).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Generate Catch QR Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"catch_id\": \"demo-catch-001\",\n  \"vessel_id\": \"{{vessel_id}}\",\n  \"species\": \"Tuna\",\n  \"weight_kg\": 450.5,\n  \"landed_ts\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/deckside/qrcode",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "deckside", "qrcode"]
+            },
+            "description": "Generate a QR code for catch traceability. Links to blockchain-anchored fish ticket data."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "DockSide (STORE)",
+      "description": "Supply chain storage, chain-of-custody tracking, and processing verification. Third pillar in the Four Pillars architecture.",
+      "item": [
+        {
+          "name": "List Processing Records",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dockside/processing?org={{org}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dockside", "processing"],
+              "query": [
+                {
+                  "key": "org",
+                  "value": "{{org}}"
+                }
+              ]
+            },
+            "description": "List processing records showing catch transformation from landing to packaged product. Includes temperature logs and HACCP compliance."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Blockchain Anchor Files",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dockside/bone/files?org={{org}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dockside", "bone", "files"],
+              "query": [
+                {
+                  "key": "org",
+                  "value": "{{org}}"
+                }
+              ]
+            },
+            "description": "Retrieve blockchain anchor files (BONE format). Shows cryptographic proof of data integrity for supply chain records."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MarketSide (EXCHANGE)",
+      "description": "Consumer verification, QR code scanning, and price prediction. Fourth pillar in the Four Pillars architecture.",
+      "item": [
+        {
+          "name": "Verify Product",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/marketside/verification?product_id=demo-product-001",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "marketside", "verification"],
+              "query": [
+                {
+                  "key": "product_id",
+                  "value": "demo-product-001"
+                }
+              ]
+            },
+            "description": "Verify product authenticity and traceability. Returns full chain-of-custody from vessel to consumer."
+          },
+          "response": []
+        },
+        {
+          "name": "Scan QR Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qr_data\": \"ST:CATCH:demo-catch-001:bl-001:2025-10-21\",\n  \"scanned_by\": \"consumer\",\n  \"scanned_ts\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/marketside/qr/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "marketside", "qr", "verify"]
+            },
+            "description": "Scan and verify a SeaTrace QR code. Returns product information, vessel details, and sustainability certifications."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": []
+}

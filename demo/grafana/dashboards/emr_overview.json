@@ -1,0 +1,208 @@
+{
+  "dashboard": {
+    "title": "SeaTrace EMR Overview - Investor Demo",
+    "uid": "seatrace-emr-overview",
+    "version": 1,
+    "timezone": "utc",
+    "schemaVersion": 38,
+    "refresh": "30s",
+    "time": {
+      "from": "now-24h",
+      "to": "now"
+    },
+    "panels": [
+      {
+        "id": 1,
+        "type": "stat",
+        "title": "ER Coverage % (Last 30 Days)",
+        "gridPos": {"x": 0, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT ROUND((COUNT(DISTINCT er.trip_id)::decimal / COUNT(DISTINCT c.trip_id) * 100), 1) as coverage FROM catches c LEFT JOIN er_reports er ON c.trip_id = er.trip_id WHERE c.landed_ts >= NOW() - INTERVAL '30 days'"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 85, "color": "yellow"},
+                {"value": 90, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 2,
+        "type": "stat",
+        "title": "EMR Run-Rate (Monthly USD)",
+        "gridPos": {"x": 6, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "time_series",
+            "expr": "sum(st_emr_estimated_cost_usd)"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "decimals": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 3,
+        "type": "stat",
+        "title": "Cost Per Tonne",
+        "gridPos": {"x": 12, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT ROUND((SUM(emr_cost) / (SUM(landed_kg)/1000))::numeric, 2) as cost_per_tonne FROM catches"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "decimals": 2,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 50, "color": "yellow"},
+                {"value": 100, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 4,
+        "type": "stat",
+        "title": "Median Catch→Report Latency",
+        "gridPos": {"x": 18, "y": 0, "w": 6, "h": 4},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY EXTRACT(EPOCH FROM (er.submitted_ts - c.landed_ts))/3600) as median_hours FROM catches c JOIN er_reports er ON c.trip_id = er.trip_id WHERE c.landed_ts >= NOW() - INTERVAL '30 days'"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "h",
+            "decimals": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 12, "color": "yellow"},
+                {"value": 24, "color": "red"}
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": 5,
+        "type": "timeseries",
+        "title": "EMR Usage by Meter (Rate)",
+        "gridPos": {"x": 0, "y": 4, "w": 12, "h": 8},
+        "targets": [
+          {
+            "refId": "A",
+            "expr": "sum by(meter, org)(rate(st_emr_events_total[5m]))",
+            "legendFormat": "{{org}} - {{meter}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth",
+              "fillOpacity": 10,
+              "stacking": {"mode": "none"}
+            }
+          }
+        }
+      },
+      {
+        "id": 6,
+        "type": "table",
+        "title": "EMR Usage Rollup by Organization",
+        "gridPos": {"x": 12, "y": 4, "w": 12, "h": 8},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT org, meter, SUM(value) as total FROM usage_ledger WHERE period = TO_CHAR(NOW(), 'YYYYMM') GROUP BY org, meter ORDER BY org, meter"
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "type": "timeseries",
+        "title": "Idempotency Replay Rate",
+        "gridPos": {"x": 0, "y": 12, "w": 12, "h": 6},
+        "targets": [
+          {
+            "refId": "A",
+            "expr": "sum(rate(st_emr_idem_replay_total[5m]))",
+            "legendFormat": "Replayed Requests"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ops",
+            "custom": {
+              "drawStyle": "line",
+              "lineInterpolation": "smooth"
+            }
+          }
+        }
+      },
+      {
+        "id": 8,
+        "type": "gauge",
+        "title": "Commons Fund Coverage %",
+        "gridPos": {"x": 12, "y": 12, "w": 12, "h": 6},
+        "targets": [
+          {
+            "refId": "A",
+            "format": "table",
+            "rawSql": "SELECT coverage_pct FROM commons_fund_snapshots ORDER BY period DESC LIMIT 1"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 150,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 90, "color": "yellow"},
+                {"value": 100, "color": "green"}
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}
