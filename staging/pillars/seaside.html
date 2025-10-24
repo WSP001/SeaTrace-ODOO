@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SeaSide (HOLD) - SeaTrace API Portal</title>
+<style>
+  :root{--bg:#0b2a57;--card:#0c2347;--ink:#e9f3ff;--muted:#a9c3e6;--accent:#22b6ff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;padding:20px}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:42px;margin:20px 0 10px}
+  .icon{font-size:48px;margin-bottom:10px}
+  .sub{color:var(--muted);margin-bottom:30px;font-size:18px}
+  .card{background:var(--card);border:1px solid #1f4d86;border-radius:16px;padding:24px;margin:20px 0}
+  h2{color:var(--accent);margin:0 0 12px}
+  p{color:var(--muted);line-height:1.6}
+  code{background:#071a38;padding:2px 8px;border-radius:4px;color:#9fe0ff}
+  pre{background:#071a38;padding:16px;border-radius:12px;overflow-x:auto;border:1px solid #0a396e}
+  .method{display:inline-block;padding:4px 10px;border-radius:6px;font-weight:700;font-size:12px;margin-right:8px}
+  .get{background:#21c17a;color:#002136}
+  .post{background:#22b6ff;color:#002136}
+  .btn{display:inline-block;padding:12px 20px;background:var(--accent);color:#002136;border-radius:10px;font-weight:700;text-decoration:none;margin-top:12px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="icon">🌊</div>
+  <h1>SeaSide (HOLD)</h1>
+  <p class="sub">Vessel tracking and initial data capture</p>
+
+  <div class="card">
+    <h2>Overview</h2>
+    <p>SeaSide is the foundation of the Four Pillars architecture. It captures initial vessel data, tracks locations in real-time, and provides the "HOLD" checkpoint for all seafood traceability records.</p>
+    
+    <p><strong>Key Features:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Real-time AIS vessel tracking</li>
+      <li>GPS-verified positioning</li>
+      <li>Vessel registration and certification</li>
+      <li>Initial quality scoring</li>
+      <li>Fishing zone compliance</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>API Endpoints</h2>
+    
+    <h3><span class="method get">GET</span> <code>/api/v1/seaside/vessels</code></h3>
+    <p>Retrieve list of registered vessels with real-time tracking data</p>
+    <pre><code>{
+  "success": true,
+  "count": 6,
+  "data": [
+    {
+      "id": "vessel-001",
+      "name": "Pacific Star",
+      "imo": "9123456",
+      "mmsi": "367123456",
+      "location": {
+        "lat": 55.3,
+        "lon": -166.2,
+        "timestamp": "2025-10-20T14:30:00Z"
+      },
+      "status": "Fishing"
+    }
+  ]
+}</code></pre>
+
+    <h3><span class="method get">GET</span> <code>/api/v1/seaside/vessels/{id}</code></h3>
+    <p>Get detailed information for a specific vessel</p>
+    <pre><code>{
+  "id": "vessel-001",
+  "name": "Pacific Star",
+  "operator": "Bering Sea Fisheries Co-op",
+  "certifications": ["MSC-F-12345", "RFM", "BAP"],
+  "targetSpecies": ["Alaska Pollock", "Pacific Cod"]
+}</code></pre>
+
+    <h3><span class="method post">POST</span> <code>/api/v1/seaside/vessels/{id}/positions</code></h3>
+    <p>Update vessel position (requires authentication)</p>
+    <pre><code>{
+  "lat": 55.3,
+  "lon": -166.2,
+  "speed": 4.2,
+  "heading": 245,
+  "timestamp": "2025-10-20T14:30:00Z"
+}</code></pre>
+
+    <h3><span class="method post">POST</span> <code>/api/v1/seaside/quality/score</code></h3>
+    <p>Submit initial quality assessment (requires authentication)</p>
+    <pre><code>{
+  "vesselId": "vessel-001",
+  "temperature": 1.5,
+  "handlingMethod": "Flash frozen at sea",
+  "score": 99
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>Use Cases</h2>
+    <p><strong>For Vessel Operators:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Register vessels and maintain certifications</li>
+      <li>Submit real-time position updates</li>
+      <li>Record initial catch quality data</li>
+    </ul>
+
+    <p><strong>For Compliance Teams:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Monitor vessel locations vs. fishing zones</li>
+      <li>Verify certification validity</li>
+      <li>Audit GPS-verified records</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:40px;text-align:center">
+    <a href="../index.html" class="btn">← Back to API Portal</a>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Authentication Guide - SeaTrace API Portal</title>
+<style>
+  :root{--bg:#0b2a57;--card:#0c2347;--ink:#e9f3ff;--muted:#a9c3e6;--accent:#22b6ff;--code:#071a38}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;padding:20px}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:42px;margin:20px 0 10px}
+  h2{font-size:28px;margin:30px 0 12px;color:var(--accent)}
+  h3{font-size:20px;margin:20px 0 10px}
+  p{line-height:1.6;color:var(--muted)}
+  .card{background:var(--card);border:1px solid #1f4d86;border-radius:16px;padding:24px;margin:20px 0}
+  code{background:var(--code);padding:2px 8px;border-radius:4px;color:#9fe0ff;font-size:14px}
+  pre{background:var(--code);padding:16px;border-radius:12px;overflow-x:auto;border:1px solid #0a396e}
+  pre code{background:none;padding:0}
+  .method{display:inline-block;padding:4px 10px;border-radius:6px;font-weight:700;font-size:12px}
+  .get{background:#21c17a;color:#002136}
+  .post{background:#22b6ff;color:#002136}
+  .alert{background:#2b2a20;border:1px solid #5b4c19;color:#ffe9ac;padding:16px;border-radius:12px;margin:16px 0}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>🔐 Authentication Guide</h1>
+  <p>API key management and JWT token authentication for SeaTrace Four Pillars API</p>
+
+  <div class="card">
+    <h2>Overview</h2>
+    <p>SeaTrace API uses two authentication methods:</p>
+    <ul style="color:var(--muted)">
+      <li><strong>API Keys</strong> - For server-to-server integration</li>
+      <li><strong>JWT Tokens</strong> - For user-authenticated sessions</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>API Key Authentication</h2>
+    <p>Include your API key in the request header:</p>
+    <pre><code>X-API-Key: your_api_key_here</code></pre>
+    
+    <h3>Example Request (cURL)</h3>
+    <pre><code>curl -H "X-API-Key: your_api_key_here" \
+  https://seatrace.worldseafoodproducers.com/api/v1/seaside/vessels</code></pre>
+
+    <h3>Example Request (JavaScript)</h3>
+    <pre><code>fetch('https://seatrace.worldseafoodproducers.com/api/v1/seaside/vessels', {
+  headers: {
+    'X-API-Key': 'your_api_key_here'
+  }
+})
+.then(res => res.json())
+.then(data => console.log(data));</code></pre>
+
+    <h3>Example Request (Python)</h3>
+    <pre><code>import requests
+
+headers = {'X-API-Key': 'your_api_key_here'}
+response = requests.get(
+    'https://seatrace.worldseafoodproducers.com/api/v1/seaside/vessels',
+    headers=headers
+)
+data = response.json()</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>JWT Token Authentication</h2>
+    <p>For user-authenticated sessions, use Bearer tokens:</p>
+    
+    <h3>Step 1: Login to Get Token</h3>
+    <p><span class="method post">POST</span> <code>/api/v1/auth/login</code></p>
+    <pre><code>{
+  "email": "user@example.com",
+  "password": "your_password"
+}</code></pre>
+
+    <h3>Response:</h3>
+    <pre><code>{
+  "success": true,
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expiresIn": 3600
+}</code></pre>
+
+    <h3>Step 2: Use Token in Requests</h3>
+    <pre><code>curl -H "Authorization: Bearer eyJhbGc..." \
+  https://seatrace.worldseafoodproducers.com/api/v1/deckside/catches</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>Public vs Private Access</h2>
+    <p><strong>Public Endpoints (No auth required):</strong></p>
+    <ul style="color:var(--muted)">
+      <li>SeaSide vessel list (read-only)</li>
+      <li>DeckSide catch verification (read-only)</li>
+      <li>DockSide processing status (read-only)</li>
+    </ul>
+
+    <p><strong>Private Endpoints (Auth required):</strong></p>
+    <ul style="color:var(--muted)">
+      <li>MarketSide transactions (write access)</li>
+      <li>Creating new records</li>
+      <li>Updating vessel positions</li>
+      <li>Generating QR codes</li>
+    </ul>
+  </div>
+
+  <div class="alert">
+    <strong>⚠️ Security Best Practices:</strong>
+    <ul style="margin:10px 0 0 20px">
+      <li>Never expose API keys in client-side code</li>
+      <li>Rotate API keys every 90 days</li>
+      <li>Use HTTPS for all requests</li>
+      <li>Store keys in environment variables</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Rate Limits</h2>
+    <p>Free tier: 100 requests/hour<br>
+    Pro tier: 10,000 requests/hour<br>
+    Enterprise: Unlimited</p>
+    
+    <h3>Rate Limit Headers</h3>
+    <pre><code>X-RateLimit-Limit: 100
+X-RateLimit-Remaining: 95
+X-RateLimit-Reset: 1635724800</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>Error Responses</h2>
+    
+    <h3>401 Unauthorized</h3>
+    <pre><code>{
+  "error": "Invalid API key",
+  "code": "INVALID_CREDENTIALS"
+}</code></pre>
+
+    <h3>403 Forbidden</h3>
+    <pre><code>{
+  "error": "Insufficient permissions",
+  "code": "FORBIDDEN"
+}</code></pre>
+
+    <h3>429 Too Many Requests</h3>
+    <pre><code>{
+  "error": "Rate limit exceeded",
+  "code": "RATE_LIMIT_EXCEEDED",
+  "retryAfter": 3600
+}</code></pre>
+  </div>
+
+  <div style="margin-top:40px;text-align:center">
+    <a href="../index.html" style="color:var(--accent)">← Back to API Portal</a>
+  </div>
+</div>
+
+</body>
+</html>

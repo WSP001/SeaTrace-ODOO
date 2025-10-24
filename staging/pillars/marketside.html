@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>MarketSide (EXCHANGE) - SeaTrace API Portal</title>
+<style>
+  :root{--bg:#0b2a57;--card:#0c2347;--ink:#e9f3ff;--muted:#a9c3e6;--accent:#22b6ff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;padding:20px}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:42px;margin:20px 0 10px}
+  .icon{font-size:48px;margin-bottom:10px}
+  .sub{color:var(--muted);margin-bottom:30px;font-size:18px}
+  .card{background:var(--card);border:1px solid #1f4d86;border-radius:16px;padding:24px;margin:20px 0}
+  h2{color:var(--accent);margin:0 0 12px}
+  p{color:var(--muted);line-height:1.6}
+  code{background:#071a38;padding:2px 8px;border-radius:4px;color:#9fe0ff}
+  pre{background:#071a38;padding:16px;border-radius:12px;overflow-x:auto;border:1px solid #0a396e}
+  .method{display:inline-block;padding:4px 10px;border-radius:6px;font-weight:700;font-size:12px;margin-right:8px}
+  .get{background:#21c17a;color:#002136}
+  .post{background:#22b6ff;color:#002136}
+  .btn{display:inline-block;padding:12px 20px;background:var(--accent);color:#002136;border-radius:10px;font-weight:700;text-decoration:none;margin-top:12px}
+  .alert{background:#2b2a20;border:1px solid #5b4c19;color:#ffe9ac;padding:16px;border-radius:12px;margin:16px 0}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="icon">🏪</div>
+  <h1>MarketSide (EXCHANGE)</h1>
+  <p class="sub">Consumer verification and market integration</p>
+
+  <div class="card">
+    <h2>Overview</h2>
+    <p>MarketSide provides the "EXCHANGE" checkpoint where seafood products are verified at point-of-sale, enabling consumers to validate authenticity and sustainable sourcing claims.</p>
+    
+    <p><strong>Key Features:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Consumer-facing QR code verification</li>
+      <li>Full supply chain visibility</li>
+      <li>Market transaction recording</li>
+      <li>Pricing and landed cost tracking</li>
+      <li>Sustainability certification display</li>
+      <li>Commons Fund transparency</li>
+    </ul>
+  </div>
+
+  <div class="alert">
+    <strong>💰 MarketSide Funds the Commons:</strong> 10% of enterprise API revenue supports public infrastructure, ensuring free access to SeaSide, DeckSide, and DockSide for local fisheries worldwide.
+  </div>
+
+  <div class="card">
+    <h2>API Endpoints</h2>
+    
+    <h3><span class="method get">GET</span> <code>/api/v1/marketside/verification</code></h3>
+    <p>Verify product authenticity via QR code (public endpoint)</p>
+    <pre><code>GET /api/v1/marketside/verification?qrCode=QR-2025-001
+
+Response:
+{
+  "valid": true,
+  "catch": {
+    "id": "catch-003",
+    "species": "Yellowfin Tuna",
+    "weight": 850,
+    "captureDate": "2025-10-17T06:15:00Z",
+    "location": {
+      "lat": 15.2,
+      "lon": 145.8,
+      "zone": "Western Pacific"
+    }
+  },
+  "vessel": {
+    "name": "Ocean Voyager",
+    "certifications": ["MSC", "Dolphin Safe", "Fair Trade"]
+  },
+  "processingChain": [
+    {
+      "facility": "Pacific Island Cold Storage",
+      "temp": -60,
+      "grade": "Sashimi"
+    }
+  ],
+  "transaction": {
+    "buyer": "Tokyo Fish Market Co Ltd",
+    "price": 18.50,
+    "currency": "USD"
+  }
+}</code></pre>
+
+    <h3><span class="method post">POST</span> <code>/api/v1/marketside/qr/verify</code></h3>
+    <p>Alternative POST method for QR verification</p>
+    <pre><code>{
+  "qrCode": "QR-2025-001"
+}</code></pre>
+
+    <h3><span class="method get">GET</span> <code>/api/v1/marketside/consumer/info</code></h3>
+    <p>Get consumer-friendly information about a product</p>
+    <pre><code>GET /api/v1/marketside/consumer/info?qrCode=QR-2025-001
+
+Response:
+{
+  "productName": "Sashimi-grade Yellowfin Tuna",
+  "origin": "Western Pacific",
+  "caughtBy": "Ocean Voyager (Hawaii)",
+  "certifications": [
+    {
+      "name": "Marine Stewardship Council (MSC)",
+      "logo": "https://..."
+    },
+    {
+      "name": "Dolphin Safe",
+      "logo": "https://..."
+    }
+  ],
+  "sustainability": {
+    "score": 9.8,
+    "summary": "Caught using selective longline methods with minimal bycatch"
+  },
+  "freshness": {
+    "score": 99,
+    "frozenAt": "2025-10-17T06:30:00Z",
+    "temperature": "-60°C"
+  }
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>Consumer Use Case</h2>
+    <p><strong>How it works:</strong></p>
+    <ol style="color:var(--muted)">
+      <li>Consumer scans QR code on seafood package</li>
+      <li>Browser opens verification page</li>
+      <li>Full supply chain displayed:
+        <ul>
+          <li>Vessel name and location</li>
+          <li>Catch date and GPS coordinates</li>
+          <li>Processing facility and temperature logs</li>
+          <li>Certifications (MSC, BAP, etc.)</li>
+          <li>Sustainability score</li>
+        </ul>
+      </li>
+      <li>Consumer can verify all claims instantly</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>Market Transactions</h2>
+    <p>MarketSide tracks commercial transactions for transparency:</p>
+    <pre><code>{
+  "transactionId": "txn-001",
+  "seller": {
+    "vessel": "Ocean Voyager",
+    "operator": "Pacific Fishing Fleet LLC"
+  },
+  "buyer": {
+    "company": "Tokyo Fish Market Co Ltd"
+  },
+  "product": {
+    "species": "Yellowfin Tuna",
+    "weight": 850,
+    "grade": "Sashimi"
+  },
+  "pricing": {
+    "pricePerKg": 18.50,
+    "totalValue": 15725,
+    "currency": "USD"
+  },
+  "status": "In transit"
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>Commons Fund Transparency</h2>
+    <p>Real-time visibility into how MarketSide supports the Commons:</p>
+    <pre><code>{
+  "totalRevenue": "$1,200,000 USD",
+  "commonsAllocation": "10%",
+  "commonsBalance": "$120,000 USD",
+  "publicEndpointsServed": 12,
+  "freeAccessProvided": "SeaSide, DeckSide, DockSide"
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>Use Cases</h2>
+    <p><strong>For Consumers:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Scan QR codes to verify sustainability claims</li>
+      <li>View full supply chain transparency</li>
+      <li>Make informed purchasing decisions</li>
+    </ul>
+
+    <p><strong>For Retailers:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Display verified certifications</li>
+      <li>Differentiate premium products</li>
+      <li>Build consumer trust</li>
+    </ul>
+
+    <p><strong>For Enterprises:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Track market transactions</li>
+      <li>Monitor pricing trends</li>
+      <li>Contribute to Commons Fund</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:40px;text-align:center">
+    <a href="../index.html" class="btn">← Back to API Portal</a>
+  </div>
+</div>
+
+</body>
+</html>

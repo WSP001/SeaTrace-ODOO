@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DeckSide (RECORD) - SeaTrace API Portal</title>
+<style>
+  :root{--bg:#0b2a57;--card:#0c2347;--ink:#e9f3ff;--muted:#a9c3e6;--accent:#22b6ff}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif;padding:20px}
+  .wrap{max-width:900px;margin:0 auto}
+  h1{font-size:42px;margin:20px 0 10px}
+  .icon{font-size:48px;margin-bottom:10px}
+  .sub{color:var(--muted);margin-bottom:30px;font-size:18px}
+  .card{background:var(--card);border:1px solid #1f4d86;border-radius:16px;padding:24px;margin:20px 0}
+  h2{color:var(--accent);margin:0 0 12px}
+  p{color:var(--muted);line-height:1.6}
+  code{background:#071a38;padding:2px 8px;border-radius:4px;color:#9fe0ff}
+  pre{background:#071a38;padding:16px;border-radius:12px;overflow-x:auto;border:1px solid #0a396e}
+  .method{display:inline-block;padding:4px 10px;border-radius:6px;font-weight:700;font-size:12px;margin-right:8px}
+  .get{background:#21c17a;color:#002136}
+  .post{background:#22b6ff;color:#002136}
+  .btn{display:inline-block;padding:12px 20px;background:var(--accent);color:#002136;border-radius:10px;font-weight:700;text-decoration:none;margin-top:12px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="icon">📊</div>
+  <h1>DeckSide (RECORD)</h1>
+  <p class="sub">Catch verification and certification</p>
+
+  <div class="card">
+    <h2>Overview</h2>
+    <p>DeckSide provides the "RECORD" checkpoint where catch data is validated, certified, and permanently recorded on the blockchain for tamper-evident traceability.</p>
+    
+    <p><strong>Key Features:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>GPS-verified catch recording</li>
+      <li>Observer validation</li>
+      <li>QR code generation for traceability</li>
+      <li>Species identification and weight validation</li>
+      <li>Certification attachment (MSC, BAP, etc.)</li>
+      <li>Quota compliance checking</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>API Endpoints</h2>
+    
+    <h3><span class="method get">GET</span> <code>/api/v1/deckside/catches</code></h3>
+    <p>Retrieve validated catch records</p>
+    <pre><code>{
+  "success": true,
+  "count": 6,
+  "data": [
+    {
+      "id": "catch-001",
+      "ticketNumber": "AK-2025-BS-1234",
+      "vesselId": "vessel-001",
+      "species": "Alaska Pollock",
+      "weight": 45000,
+      "unit": "kg",
+      "location": {
+        "lat": 55.3,
+        "lon": -166.2
+      },
+      "timestamp": "2025-10-20T10:30:00Z",
+      "gpsVerified": true,
+      "qrCode": "QR-2025-BS-1234",
+      "status": "Validated"
+    }
+  ]
+}</code></pre>
+
+    <h3><span class="method get">GET</span> <code>/api/v1/deckside/catches/{id}</code></h3>
+    <p>Get detailed catch record with full validation data</p>
+
+    <h3><span class="method post">POST</span> <code>/api/v1/deckside/catches</code></h3>
+    <p>Submit new catch record for validation (requires authentication)</p>
+    <pre><code>{
+  "vesselId": "vessel-001",
+  "species": "Alaska Pollock",
+  "weight": 45000,
+  "unit": "kg",
+  "location": {
+    "lat": 55.3,
+    "lon": -166.2
+  },
+  "timestamp": "2025-10-20T10:30:00Z",
+  "observer": {
+    "name": "John Martinez",
+    "id": "NMFS-OBS-8821"
+  }
+}</code></pre>
+
+    <h3><span class="method post">POST</span> <code>/api/v1/deckside/qrcode</code></h3>
+    <p>Generate tamper-evident QR code for catch traceability</p>
+    <pre><code>{
+  "catchId": "catch-001"
+}</code></pre>
+    <p><strong>Response:</strong></p>
+    <pre><code>{
+  "success": true,
+  "qrCode": "QR-2025-BS-1234",
+  "qrImageUrl": "https://api.../qr/QR-2025-BS-1234.png",
+  "verificationUrl": "https://seatrace.../verify/QR-2025-BS-1234"
+}</code></pre>
+  </div>
+
+  <div class="card">
+    <h2>Use Cases</h2>
+    <p><strong>For Fishing Vessels:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Record catch data immediately upon landing</li>
+      <li>Generate QR codes for each catch lot</li>
+      <li>Attach observer validation and signatures</li>
+    </ul>
+
+    <p><strong>For Processors:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Scan QR codes to verify catch authenticity</li>
+      <li>View full catch history and certifications</li>
+      <li>Maintain chain of custody documentation</li>
+    </ul>
+
+    <p><strong>For Consumers:</strong></p>
+    <ul style="color:var(--muted)">
+      <li>Scan QR code on product packaging</li>
+      <li>View vessel, location, and certification data</li>
+      <li>Verify sustainable sourcing claims</li>
+    </ul>
+  </div>
+
+  <div style="margin-top:40px;text-align:center">
+    <a href="../index.html" class="btn">← Back to API Portal</a>
+  </div>
+</div>
+
+</body>
+</html>

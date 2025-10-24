@@ -1,0 +1,276 @@
+{
+  "info": {
+    "name": "SeaTrace Four Pillars API",
+    "description": "Production-ready marine intelligence API endpoints for sustainable fishing and seafood traceability.\n\n**For the Commons Good** 🌊\n\nStack Operator Valuation: $4.2M USD",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://seatrace.worldseafoodproducers.com/api/v1"
+    },
+    {
+      "key": "apiKey",
+      "value": "YOUR_API_KEY_HERE"
+    }
+  ],
+  "item": [
+    {
+      "name": "SeaSide (HOLD)",
+      "item": [
+        {
+          "name": "List All Vessels",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/seaside/vessels?limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["seaside", "vessels"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "status",
+                  "value": "active",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Vessel by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/seaside/vessels/vessel-001",
+              "host": ["{{baseUrl}}"],
+              "path": ["seaside", "vessels", "vessel-001"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Vessel Position",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vesselId\": \"vessel-001\",\n  \"location\": {\n    \"lat\": 34.0522,\n    \"lon\": -118.2437\n  },\n  \"timestamp\": \"2025-10-20T14:30:00Z\",\n  \"status\": \"fishing\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/seaside/vessels/vessel-001/positions",
+              "host": ["{{baseUrl}}"],
+              "path": ["seaside", "vessels", "vessel-001", "positions"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "DeckSide (RECORD)",
+      "item": [
+        {
+          "name": "List Catch Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/deckside/catches",
+              "host": ["{{baseUrl}}"],
+              "path": ["deckside", "catches"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Catch Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vesselId\": \"vessel-001\",\n  \"species\": \"Pacific Salmon\",\n  \"weight\": 1250.5,\n  \"unit\": \"kg\",\n  \"location\": {\n    \"lat\": 34.0522,\n    \"lon\": -118.2437\n  },\n  \"timestamp\": \"2025-10-20T10:00:00Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/deckside/catches",
+              "host": ["{{baseUrl}}"],
+              "path": ["deckside", "catches"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Generate QR Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"catchId\": \"catch-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/deckside/qrcode",
+              "host": ["{{baseUrl}}"],
+              "path": ["deckside", "qrcode"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "DockSide (STORE)",
+      "item": [
+        {
+          "name": "List Processing Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dockside/processing",
+              "host": ["{{baseUrl}}"],
+              "path": ["dockside", "processing"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Processing Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"catchId\": \"catch-001\",\n  \"facility\": \"Arctic Cold Storage\",\n  \"temperature\": -18.2,\n  \"status\": \"stored\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/dockside/processing",
+              "host": ["{{baseUrl}}"],
+              "path": ["dockside", "processing"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MarketSide (EXCHANGE)",
+      "item": [
+        {
+          "name": "Verify Product",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/marketside/verification?qrCode=QR-2025-001",
+              "host": ["{{baseUrl}}"],
+              "path": ["marketside", "verification"],
+              "query": [
+                {
+                  "key": "qrCode",
+                  "value": "QR-2025-001"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify QR Code (POST)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-API-Key",
+                "value": "{{apiKey}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qrCode\": \"QR-2025-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/marketside/qr/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["marketside", "qr", "verify"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

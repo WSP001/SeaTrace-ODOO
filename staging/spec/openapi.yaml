@@ -1,0 +1,321 @@
+openapi: 3.0.0
+info:
+  title: SeaTrace Four Pillars API
+  version: 1.0.0
+  description: |
+    Production-ready marine intelligence API endpoints for sustainable fishing and seafood traceability.
+    
+    **For the Commons Good** 🌊
+    
+    Stack Operator Valuation: $4.2M USD
+  contact:
+    name: SeaTrace API Support
+    email: api@worldseafoodproducers.com
+    url: https://seatrace.worldseafoodproducers.com
+  license:
+    name: Commons License
+    url: https://worldseafoodproducers.com/license
+
+servers:
+  - url: https://seatrace.worldseafoodproducers.com/api/v1
+    description: Production server
+  - url: https://staging.seatrace.worldseafoodproducers.com/api/v1
+    description: Staging server
+
+tags:
+  - name: SeaSide
+    description: Vessel tracking and initial data capture (HOLD)
+  - name: DeckSide
+    description: Catch verification and certification (RECORD)
+  - name: DockSide
+    description: Supply chain and storage management (STORE)
+  - name: MarketSide
+    description: Consumer verification and market integration (EXCHANGE)
+
+paths:
+  /seaside/vessels:
+    get:
+      summary: List all vessels
+      description: Retrieve a list of registered fishing vessels with real-time tracking data
+      tags:
+        - SeaSide
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [active, inactive, fishing, transiting]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  count:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Vessel'
+
+  /seaside/vessels/{id}:
+    get:
+      summary: Get vessel details
+      description: Retrieve detailed information for a specific vessel
+      tags:
+        - SeaSide
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Vessel found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vessel'
+        '404':
+          description: Vessel not found
+
+  /deckside/catches:
+    get:
+      summary: List catch records
+      description: Retrieve validated catch records with GPS verification
+      tags:
+        - DeckSide
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Catch'
+
+    post:
+      summary: Create catch record
+      description: Submit a new catch record for validation
+      tags:
+        - DeckSide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CatchInput'
+      responses:
+        '201':
+          description: Catch record created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Catch'
+
+  /deckside/qrcode:
+    post:
+      summary: Generate QR code
+      description: Generate a tamper-evident QR code for catch traceability
+      tags:
+        - DeckSide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                catchId:
+                  type: string
+      responses:
+        '200':
+          description: QR code generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  qrCode:
+                    type: string
+                  url:
+                    type: string
+
+  /dockside/processing:
+    get:
+      summary: List processing records
+      description: Retrieve cold storage and processing facility records
+      tags:
+        - DockSide
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProcessingRecord'
+
+  /marketside/verification:
+    get:
+      summary: Verify product authenticity
+      description: Consumer-facing endpoint to verify seafood product authenticity
+      tags:
+        - MarketSide
+      parameters:
+        - name: qrCode
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Verification'
+
+components:
+  schemas:
+    Vessel:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        imo:
+          type: string
+        mmsi:
+          type: string
+        flag:
+          type: string
+        location:
+          type: object
+          properties:
+            lat:
+              type: number
+            lon:
+              type: number
+            timestamp:
+              type: string
+              format: date-time
+        status:
+          type: string
+          enum: [active, inactive, fishing, transiting]
+        certifications:
+          type: array
+          items:
+            type: string
+
+    Catch:
+      type: object
+      properties:
+        id:
+          type: string
+        vesselId:
+          type: string
+        species:
+          type: string
+        weight:
+          type: number
+        location:
+          type: object
+          properties:
+            lat:
+              type: number
+            lon:
+              type: number
+        timestamp:
+          type: string
+          format: date-time
+        qrCode:
+          type: string
+        validated:
+          type: boolean
+
+    CatchInput:
+      type: object
+      required:
+        - vesselId
+        - species
+        - weight
+      properties:
+        vesselId:
+          type: string
+        species:
+          type: string
+        weight:
+          type: number
+        location:
+          type: object
+          properties:
+            lat:
+              type: number
+            lon:
+              type: number
+
+    ProcessingRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        catchId:
+          type: string
+        facility:
+          type: string
+        temperature:
+          type: number
+        status:
+          type: string
+
+    Verification:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        catch:
+          $ref: '#/components/schemas/Catch'
+        vessel:
+          $ref: '#/components/schemas/Vessel'
+        processingChain:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProcessingRecord'
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []

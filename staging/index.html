@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SeaTrace API Portal</title>
+<style>
+  :root{
+    --bg:#0b2a57; --bg2:#123b74; --panel:#0f2e5f; --ink:#e9f3ff; --muted:#a9c3e6;
+    --accent:#22b6ff; --accent2:#10e0dd; --outline:#2bd0ff; --chip:#ffd35a;
+    --card:#0c2347; --green:#21c17a; --warn:#ffb24d;
+  }
+  *{box-sizing:border-box} body{margin:0;background:
+    radial-gradient(1200px 800px at 20% -10%, #17498f 0%, transparent 50%),
+    radial-gradient(1200px 800px at 120% 10%, #0a3778 0%, transparent 50%),
+    var(--bg); color:var(--ink); font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial,sans-serif}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+  /* nav */
+  .nav{position:sticky;top:0;z-index:10;background:linear-gradient(180deg,#0b254e 0,#0b254ee6 100%);backdrop-filter:blur(6px);border-bottom:1px solid #1f4d86}
+  .nav-inner{display:flex;align-items:center;gap:24px;height:56px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:700}
+  .brand .logo{width:24px;height:24px;border-radius:6px;background:linear-gradient(135deg,#1bd5ff,#10e0dd)}
+  .links{margin-left:auto;display:flex;gap:22px}
+  .links a{color:#cfe4ff;opacity:.9} .links a:hover{opacity:1}
+  /* hero */
+  .hero{padding:72px 0 36px;text-align:center}
+  .hero h1{font-size:56px;line-height:1.05;margin:0 0 8px}
+  .hero h2{font-size:22px;color:#cfe4ff;font-weight:600;margin:0 0 22px}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:#2b2a20;
+    padding:10px 14px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.35);
+    border:1px solid #5b4c19;color:#ffe9ac}
+  .chip::before{content:"💰"}
+  .sub{margin-top:14px;color:#bcd1ee}
+  /* grid */
+  .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .card{background:linear-gradient(180deg,#0f2e5f,#0a2550);
+    border:1px solid var(--outline);border-radius:16px;padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+  .card h3{margin:8px 0 6px;font-size:22px}
+  .card p{color:var(--muted);margin:0 0 8px}
+  .api-list{background:#071a38;border-radius:12px;padding:12px;margin:12px 0}
+  .api-list code{display:block;background:#031227;border:1px solid #0a396e;border-radius:8px;padding:8px 10px;margin:6px 0;color:#9fe0ff}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:#0fe; color:#002136; font-weight:700;border:0;cursor:pointer}
+  .btn .s{font-size:18px}
+  /* docs band */
+  .band{margin:36px 0 28px;padding:22px;border:1px solid #1f4d86;border-radius:18px;background:linear-gradient(180deg,#0e2a57,#0b2347)}
+  .band h2{margin:0 0 12px}
+  .docs{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+  .tile{background:var(--card);border:1px solid #1f4d86;border-radius:14px;padding:16px}
+  .tile h4{margin:0 0 6px}
+  .tile p{color:var(--muted);margin:0 0 12px}
+  .tile .btn{background:var(--accent);color:#00182a}
+  /* footer status bar */
+  .statusbar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:12px;align-items:center;
+    padding:10px 14px;background:#071a36;border-top:1px solid #133d70;color:#cfe4ff;font-size:14px}
+  .dot{width:10px;height:10px;border-radius:50%}
+  .dot.ok{background:var(--green)} .dot.bad{background:#ff6e3a}
+  .spacer{flex:1}
+</style>
+</head>
+<body>
+
+<!-- nav -->
+<div class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand"><span class="logo"></span><span>SeaTrace API Portal</span></div>
+    <div class="links">
+      <a href="#pillars">Four Pillars</a>
+      <a href="#docs">API Docs</a>
+      <a href="postman.collection.json">Postman</a>
+      <a href="https://worldseafoodproducers.com">Main Site</a>
+    </div>
+  </div>
+</div>
+
+<!-- hero -->
+<section class="hero">
+  <div class="wrap">
+    <h1>SeaTrace API Portal</h1>
+    <h2>Four Pillars Architecture</h2>
+    <div class="chip">Stack Operator Valuation: <span id="val">$4.2M USD</span></div>
+    <p class="sub">Production-ready marine intelligence API endpoints for sustainable fishing and seafood traceability.</p>
+  </div>
+</section>
+
+<!-- performance banner -->
+<section class="wrap" style="padding:24px 0">
+  <div style="background:linear-gradient(135deg,#0a3778,#17498f);border:2px solid #22b6ff;border-radius:18px;padding:24px;text-align:center">
+    <h2 style="margin:0 0 16px;color:#fff">⚡ Higher Performance Architecture</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+      
+      <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:#0fe">99.9%</div>
+        <div style="color:#cfe4ff">Faster Verification</div>
+        <div style="font-size:12px;color:#9fb9d9">3-5 days → &lt;10 seconds</div>
+      </div>
+      
+      <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:#21c17a">94%</div>
+        <div style="color:#cfe4ff">ER Coverage</div>
+        <div style="font-size:12px;color:#9fb9d9">4,140 trips tracked</div>
+      </div>
+      
+      <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:#ffd35a">112%</div>
+        <div style="color:#cfe4ff">Commons Fund</div>
+        <div style="font-size:12px;color:#9fb9d9">Self-sustaining</div>
+      </div>
+      
+      <div style="background:rgba(255,255,255,0.1);border-radius:12px;padding:16px">
+        <div style="font-size:36px;font-weight:700;color:#22b6ff">&lt;10s</div>
+        <div style="color:#cfe4ff">API Response</div>
+        <div style="font-size:12px;color:#9fb9d9">Ed25519 signatures</div>
+      </div>
+      
+    </div>
+  </div>
+</section>
+
+<!-- pillars -->
+<section id="pillars" class="wrap" style="padding:8px 0 24px">
+  <div class="grid">
+
+    <div class="card">
+      <h3>🌊 SeaSide (HOLD)</h3>
+      <p>Vessel tracking and initial data capture</p>
+      <div style="background:#071a38;border-radius:8px;padding:8px;margin:8px 0;font-size:13px;color:#9fe0ff">
+        📦 Model: <code style="color:#0fe">PublicVesselPacket</code><br>
+        🔗 Output: PING-{vessel_id} (F/V 000-137)
+      </div>
+      <div class="api-list">
+        <code>GET /api/v1/seaside/vessels</code>
+        <code>GET /api/v1/seaside/vessels/{id}</code>
+        <code>POST /api/v1/seaside/quality/score</code>
+      </div>
+      <a href="pillars/seaside.html" class="btn"><span class="s">🔎</span> Test SeaSide API</a>
+    </div>
+
+    <div class="card">
+      <h3>📊 DeckSide (RECORD)</h3>
+      <p>Catch verification and certification</p>
+      <div style="background:#071a38;border-radius:8px;padding:8px;margin:8px 0;font-size:13px;color:#9fe0ff">
+        📦 Model: <code style="color:#0fe">PublicCatchPacket</code><br>
+        🔗 Output: CATCH-{trip_id} (4,140 trips)
+      </div>
+      <div class="api-list">
+        <code>GET /api/v1/deckside/catches</code>
+        <code>GET /api/v1/deckside/catches/{id}</code>
+        <code>POST /api/v1/deckside/qrcode</code>
+      </div>
+      <a href="pillars/deckside.html" class="btn"><span class="s">🔎</span> Test DeckSide API</a>
+    </div>
+
+    <div class="card">
+      <h3>🐟 DockSide (STORE)</h3>
+      <p>Supply chain and storage management</p>
+      <div style="background:#071a38;border-radius:8px;padding:8px;margin:8px 0;font-size:13px;color:#9fe0ff">
+        📦 Model: <code style="color:#0fe">PublicLotPacket</code><br>
+        🔗 Output: LOT-{lot_number} (BBSS format)
+      </div>
+      <div class="api-list">
+        <code>GET /api/v1/dockside/processing</code>
+        <code>POST /api/v1/dockside/processing</code>
+        <code>GET /api/v1/dockside/bone/files</code>
+      </div>
+      <a href="pillars/dockside.html" class="btn"><span class="s">🔎</span> Test DockSide API</a>
+    </div>
+
+    <div class="card">
+      <h3>🏪 MarketSide (EXCHANGE)</h3>
+      <p>Consumer verification and market integration</p>
+      <div style="background:#071a38;border-radius:8px;padding:8px;margin:8px 0;font-size:13px;color:#9fe0ff">
+        📦 Model: <code style="color:#0fe">PublicVerificationPacket</code><br>
+        🔗 Output: VERIFY-{id} (&lt;10s response)
+      </div>
+      <div class="api-list">
+        <code>GET /api/v1/marketside/verification</code>
+        <code>POST /api/v1/marketside/qr/verify</code>
+        <code>GET /api/v1/marketside/consumer/info</code>
+      </div>
+      <a href="pillars/marketside.html" class="btn"><span class="s">🔎</span> Test MarketSide API</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- docs/tools -->
+<section id="docs" class="wrap band">
+  <h2>🚀 API Documentation & Tools</h2>
+  <p style="color:#bcd1ee">Comprehensive documentation and testing tools for SeaTrace Four Pillars API</p>
+  <div class="docs">
+    <div class="tile">
+      <h4>📄 OpenAPI Spec</h4>
+      <p>Complete API specification with schemas and examples</p>
+      <a class="btn" href="spec/openapi.yaml">View Spec</a>
+    </div>
+    <div class="tile">
+      <h4>📦 Postman Collection</h4>
+      <p>Production-ready Postman collection for all endpoints</p>
+      <a class="btn" href="postman.collection.json">Import Collection</a>
+    </div>
+    <div class="tile">
+      <h4>🛠 SDK Downloads</h4>
+      <p>Client libraries for Python, JavaScript, and .NET</p>
+      <a class="btn" href="sdks/index.html">Download SDKs</a>
+    </div>
+    <div class="tile">
+      <h4>🔐 Authentication</h4>
+      <p>API key management and JWT token authentication</p>
+      <a class="btn" href="docs/auth.html">Auth Guide</a>
+    </div>
+  </div>
+</section>
+
+<div style="height:60px"></div>
+
+<!-- footer status bar -->
+<div class="statusbar">
+  <span id="dot" class="dot ok"></span>
+  <span id="apistatus">API Status: Operational</span>
+  <span class="spacer"></span>
+  <span>© 2025 SeaTrace - WorldSeafoodProducers.com | Four Pillars Architecture | Stack Operator Validated</span>
+</div>
+
+<script>
+  // Live status check
+  fetch('status.ping.php',{cache:'no-store'})
+    .then(r=>r.text()).then(t=>{
+      const dot=document.getElementById('dot');
+      const el=document.getElementById('apistatus');
+      el.textContent='API Status: '+t;
+      if((t+'').toLowerCase().indexOf('degraded')>-1 || (t+'').toLowerCase().indexOf('unavailable')>-1){
+        dot.className='dot bad';
+      } else {
+        dot.className='dot ok';
+      }
+    }).catch(()=>{
+      document.getElementById('apistatus').textContent='API Status: Checking...';
+      document.getElementById('dot').className='dot ok';
+    });
+</script>
+</body>
+</html>
