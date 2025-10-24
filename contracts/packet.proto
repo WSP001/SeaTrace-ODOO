@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package seatrace.packet.v1;
+
+import "google/protobuf/timestamp.proto";
+
+// Signature metadata for each pillar hop.
+message Signature {
+  string signer_id = 1;   // "seaside" | "deckside" | "dockside" | "marketside"
+  string algo      = 2;   // "Ed25519"
+  bytes  value     = 3;   // raw sig bytes (b64url when stored)
+}
+
+// Minimal packet shared across the Four Pillars public surfaces.
+message Packet {
+  string id                        = 1;  // ULID/UUID
+  string vessel_id                 = 2;  // MMSI/IMO
+  google.protobuf.Timestamp ts_utc = 3;
+  double lat                       = 4;  // coarse/public or 0.0
+  double lon                       = 5;  // coarse/public or 0.0
+  float  trust_score               = 6;  // 0..1 (DeckSide calculated)
+  Signature signature              = 7;  // signer of this layer
+  bytes encrypted_prev             = 8;  // onion link to previous packet (optional)
+}

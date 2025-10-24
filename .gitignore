@@ -20,3 +20,131 @@ build/
 logs/
 *.db
 *.sqlite*
+# Private keys and secrets
+*.pem
+*.key
+*.p12
+*.pfx
+.env
+.env.local
+secrets/
+keys/
+
+# SeaTrace002/003 proprietary code
+**/SeaTrace002/**
+**/SeaTrace003/**
+**/proprietary/**
+
+# Database and credentials
+*.db
+*.sqlite
+config/production.yaml
+config/secrets.yaml
+
+# API keys and sensitive config
+**/api_keys/**
+**/*_secret*
+**/*_private*
+**/*_signing_key*
+PRIVATE_*.md
+*ENTITLEMENTS*.py
+
+# Large files and media (use Git LFS if needed)
+*.mp4
+*.mov
+*.avi
+*.mp3
+*.wav
+*.zip
+*.tar.gz
+*.rar
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# Node modules (if using JS tooling)
+node_modules/
+package-lock.json
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# Backup files
+*.bak
+*.backup
+*_backup_*
+
+# Test coverage
+.coverage
+coverage.xml
+*.cover
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Commons Good Separation - NEVER include private files
+PRIVATE_ENTITLEMENTS_HANDOFF.md
+docs/licensing/PRIVATE-LIMITED.md
+docs/marketing/INVESTOR_PROSPECTUS.md
+src/marketside/licensing/entitlements.py
+src/emr/meter_private.py
+
+# Local Planning Documents (DO NOT COMMIT - Keep Local Only)
+*_PLAN.md
+*_SUMMARY.md
+*_COMPLETE.md
+*_READY.md
+*_CHECKLIST.md
+*_AUDIT.md
+ACTION_PLAN.md
+DEMO.md
+DEMO_DATA_PLAN.md
+DEMO_OPTIMIZATION_STRATEGIC_PLAN.md
+DEMO_READY_SUMMARY.md
+DEPLOY_NOW*.md
+EXECUTION_SUMMARY.md
+INVESTOR_DEMO_MVP_SUMMARY.md
+MAINTENANCE_CHECKLIST.md
+PR_TEMPLATE*.md
+README_DOCS.md
+STAGING_FILES_READY.md
+WORKSPACE_AUDIT_REPORT.md
+MODULAR_STAGE_1_DEMO_READINESS_AUDIT.md
+MODULAR_STAGE1_DEMO_INTEGRATION.md
+REPO_ORGANIZATION_PLAN.md
+4-PILLAR_DEPLOYMENT_MASTER.md
+COMMIT_GUIDANCE.md
+MICROSERVICES_FLOW_CONFIRMED.md
+PRODUCTION_DEPLOYMENT_PLAN.md
+PROJECT_INDEX.md
+INTEGRATION_READY.md
+FULL_FLEET_SEED_READY.md
+EMR_DEMO_INTEGRATION.md
+
+# Private Deployment Docs (SeaTrace002/003 Only)
+EMERGENCY_WEBSITE_FIX.md
+FIX_SSL_NETLIFY.md
+NETFIRMS*.md
+QUICK_START_NETFIRMS.md
+
+# Next.js Build Output
+.next/
+out/

@@ -1,0 +1,15 @@
+version: v1
+
+lint:
+  use:
+    - DEFAULT
+
+breaking:
+  use:
+    - FILE
+
+build:
+  excludes:
+    - node_modules
+    - .next
+    - .git
