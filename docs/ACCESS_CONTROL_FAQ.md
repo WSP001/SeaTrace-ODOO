@@ -35,7 +35,7 @@
                      ▼
 ┌─────────────────────────────────────────────────────────────┐
 │  Layer 2: Scope Validation                                   │
-│  ✓ Is route allowed by token type (PUL/PL)?                │
+│  ✓ Is route allowed by token type (PUL / PL)?               │
 │  ✓ Does scope_digest match allowed routes?                  │
 │  ✓ Is this endpoint in the pillar list?                     │
 └────────────────────┬────────────────────────────────────────┘
@@ -160,9 +160,9 @@ WRITE Operation (POST /ingest/packet)
                            │
                     ┌──────┴───────┐
                     │              │
-        ❌ No Signature       ✅ Valid Signature
-        or Invalid           from Registered
-                            Vessel
+          ❌ No Signature     ✅ Valid Signature
+          or Invalid         from Registered
+                             Vessel
                     │              │
                     ▼              ▼
             ┌──────────┐    ┌──────────┐
