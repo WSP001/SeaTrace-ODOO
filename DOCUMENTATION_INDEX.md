@@ -166,6 +166,30 @@ Based on real mistakes from your terminal session today.
 
 ---
 
+### 7. docs/ACCESS_CONTROL_FAQ.md
+**Purpose:** Explains token-based security and access control  
+**Length:** Comprehensive (500+ lines)  
+**Best for:** Understanding "Can anybody with this link make changes?"  
+**Read when:** Questions about security, authentication, or authorization  
+
+**Contains:**
+- Multi-layer security model explanation
+- Token types (PUL vs PL) and permissions
+- Real-world attack scenarios and mitigations
+- Access control matrix
+- Best practices for developers
+- Testing access control
+
+**Key sections:**
+- The Big Question: "Can Anybody With This Link Make Changes?"
+- Understanding Token Types
+- Multi-Layer Security Model
+- Real-World Example: Vessel Data Submission
+- Common Attack Scenarios and Mitigations
+- Access Control Matrix
+
+---
+
 ## 🎯 Reading Paths
 
 ### Path 1: "I Just Want to Get Started"
