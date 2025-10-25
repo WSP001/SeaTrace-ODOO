@@ -280,13 +280,37 @@ trade_result = sdk.marketside.process_trade({
 - [Integration Guide](docs/integration-guides/odoo-setup.md)
 - [API Reference](docs/api-reference/seatrace-api.md)
 - [Deployment Guide](docs/deployment-guide.md)
+- [Proceeding Master Integration](PROCEEDING_MASTER_INTEGRATION.md) - Cryptography integration guide
+- [Practice Gamebook](PRACTICE_GAMEBOOK.md) - Complete playbook for 4-pillar architecture
 
 ### Business & Marketing
 - [Public Functional Overview](docs/marketing/public-overview.md) - Stakeholder-friendly technical summary
 - [Business Case](docs/marketing/business-case.md) - Value proposition and ROI analysis
 - [Investor Overview](docs/marketing/investor-overview.md) - Investment opportunity summary
 
+### Maintenance & Operations
+- [Maintenance Checklist](MAINTENANCE_CHECKLIST.md) - Monthly/quarterly maintenance tasks
+- [Repository Separation Audit](../REPO_SEPARATION_AUDIT.md) - Security verification report
+- [Coach's Final Summary](COACH_FINAL_SUMMARY.md) - Integration completion summary
+
 > **Note:** This repository contains only public-facing functional summaries. Advanced trading algorithms, proprietary pricing logic, and monetized module implementations are excluded for security and competitive reasons.
+
+---
+
+## 🔐 **Repository Separation & Security**
+
+**This is a PUBLIC repository** containing only generic, open-source patterns. It is completely separate from:
+- **SirJamesAdventures** (PERSONAL) - Educational experiments and learning
+- **SeaTrace002** (LEGACY PRIVATE) - Reference-only proprietary code
+- **SeaTrace003** (ACTIVE PRIVATE) - Enterprise features and A2A handlers
+
+**Security Guarantees:**
+- ✅ No private keys or secrets committed
+- ✅ No proprietary algorithms from private repos
+- ✅ No customer data or sensitive information
+- ✅ Regular separation audits (see `scripts/audit-separation.ps1`)
+
+**For security audit results, see:** [REPO_SEPARATION_AUDIT.md](../REPO_SEPARATION_AUDIT.md)
 
 ---
 
