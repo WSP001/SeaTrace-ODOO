@@ -107,6 +107,28 @@ docs/marketing/INVESTOR_PROSPECTUS.md
 src/marketside/licensing/entitlements.py
 src/emr/meter_private.py
 
+# --- HOUSEKEEPING: Private Implementation (SeaTrace003 ONLY) ---
+# Four Pillars microservice implementations (PRIVATE IP)
+/services/
+/services/common/
+/services/seaside/
+/services/deckside/
+/services/dockside/
+/services/marketside/
+
+# Private infrastructure and deployment scripts
+/scripts/initialize_packet_switching.ps1
+/scripts/postman_seatrace_collection.ps1
+/scripts/integrate-proceeding-master.ps1
+/scripts/deploy_*.ps1
+
+# ML models and algorithms (PRIVATE IP)
+/networkx/
+/venv/Lib/site-packages/networkx/
+
+# Private test files
+/tests/services/
+
 # Local Planning Documents (DO NOT COMMIT - Keep Local Only)
 *_PLAN.md
 *_SUMMARY.md
