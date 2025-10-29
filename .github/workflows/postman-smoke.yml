@@ -1,0 +1,23 @@
+name: postman-smoke
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Newman
+        run: npm install --global newman
+      - name: Run Commons Good smoke tests
+        run: >
+          newman run
+          postman/collections/SeaTrace_Commons_KPI_Demo.postman_collection.json
+          --env-var baseUrl=${{ secrets.PUBLIC_BASE_URL }}
+          --reporters cli
+          --bail

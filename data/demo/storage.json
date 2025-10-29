@@ -1,0 +1,264 @@
+{
+  "storageRecords": [
+    {
+      "id": "storage-001",
+      "facilityId": "FDA-AK-12345",
+      "facilityName": "Arctic Cold Storage",
+      "location": {
+        "address": "1000 Airport Way",
+        "city": "King Salmon",
+        "state": "Alaska",
+        "zip": "99613",
+        "country": "USA",
+        "coordinates": {
+          "lat": 58.6767,
+          "lon": -156.6494
+        }
+      },
+      "lotNumber": "BBSS-2025-1019-001",
+      "catchId": "catch-004",
+      "species": "Sockeye Salmon",
+      "quantity": {
+        "weight": 6804,
+        "unit": "kg",
+        "packages": 272,
+        "packageType": "50lb wax boxes"
+      },
+      "received": "2025-10-19T08:00:00Z",
+      "expectedDeparture": "2025-11-15T00:00:00Z",
+      "temperature": {
+        "target": -18,
+        "current": -18.2,
+        "min": -18.5,
+        "max": -17.8,
+        "lastCheck": "2025-10-20T14:00:00Z",
+        "monitoringSystem": "TempTale Ultra",
+        "alertsActive": false
+      },
+      "quality": {
+        "grade": "A+",
+        "freshnessScore": 98,
+        "fatContent": 12.5,
+        "colorScore": 9.2,
+        "parasiteCheck": "Pass",
+        "bacterialCount": "Negative",
+        "shelfLifeMonths": 18
+      },
+      "certifications": ["HACCP", "FDA", "MSC CoC"],
+      "operator": "Arctic Cold Storage Inc",
+      "contact": {
+        "name": "Mike Patterson",
+        "phone": "+1-907-246-3456",
+        "email": "operations@arcticcold.com"
+      },
+      "status": "Stored"
+    },
+    {
+      "id": "storage-002",
+      "facilityId": "FDA-AK-67890",
+      "facilityName": "Dutch Harbor Cold Storage",
+      "location": {
+        "address": "500 Harbor Drive",
+        "city": "Dutch Harbor",
+        "state": "Alaska",
+        "zip": "99692",
+        "country": "USA",
+        "coordinates": {
+          "lat": 53.8936,
+          "lon": -166.5436
+        }
+      },
+      "lotNumber": "DHAL-2025-1020-045",
+      "catchId": "catch-001",
+      "species": "Alaska Pollock",
+      "quantity": {
+        "weight": 45000,
+        "unit": "kg",
+        "packages": 900,
+        "packageType": "50kg blocks"
+      },
+      "received": "2025-10-20T12:00:00Z",
+      "expectedDeparture": "2025-10-25T00:00:00Z",
+      "temperature": {
+        "target": -20,
+        "current": -20.1,
+        "min": -20.5,
+        "max": -19.8,
+        "lastCheck": "2025-10-20T14:30:00Z",
+        "monitoringSystem": "Emerson E2 Cold Chain",
+        "alertsActive": false
+      },
+      "quality": {
+        "grade": "A",
+        "freshnessScore": 96,
+        "proteinContent": 17.2,
+        "moistureContent": 81.5,
+        "processing": "Surimi grade"
+      },
+      "certifications": ["HACCP", "FDA", "MSC CoC", "BRC"],
+      "operator": "UniSea Cold Storage",
+      "contact": {
+        "name": "Jennifer Wong",
+        "phone": "+1-907-581-1234",
+        "email": "coldchain@unisea.com"
+      },
+      "status": "Stored"
+    },
+    {
+      "id": "storage-003",
+      "facilityId": "FDA-ME-23456",
+      "facilityName": "Portland Fish Pier Cold Storage",
+      "location": {
+        "address": "84 Commercial St",
+        "city": "Portland",
+        "state": "Maine",
+        "zip": "04101",
+        "country": "USA",
+        "coordinates": {
+          "lat": 43.6591,
+          "lon": -70.2568
+        }
+      },
+      "lotNumber": "PFPC-2025-1018-087",
+      "catchId": "catch-002",
+      "species": "Atlantic Cod",
+      "quantity": {
+        "weight": 1250,
+        "unit": "kg",
+        "packages": 50,
+        "packageType": "25kg ice-packed totes"
+      },
+      "received": "2025-10-18T16:30:00Z",
+      "expectedDeparture": "2025-10-22T00:00:00Z",
+      "temperature": {
+        "target": 0,
+        "current": 0.5,
+        "min": 0.0,
+        "max": 1.5,
+        "lastCheck": "2025-10-20T13:45:00Z",
+        "monitoringSystem": "Manual checks + ice",
+        "alertsActive": false
+      },
+      "quality": {
+        "grade": "A",
+        "freshnessScore": 94,
+        "eyeClarity": "Clear",
+        "gillColor": "Bright red",
+        "firmness": "Excellent",
+        "odor": "Fresh sea smell"
+      },
+      "certifications": ["HACCP", "FDA"],
+      "operator": "Gulf of Maine Cold Storage",
+      "contact": {
+        "name": "Robert Sullivan",
+        "phone": "+1-207-772-4334",
+        "email": "rsullivan@portlandpier.com"
+      },
+      "status": "Awaiting shipment"
+    },
+    {
+      "id": "storage-004",
+      "facilityId": "FDA-GU-34567",
+      "facilityName": "Pacific Island Cold Storage",
+      "location": {
+        "address": "Cabras Island",
+        "city": "Piti",
+        "state": "Guam",
+        "zip": "96915",
+        "country": "USA",
+        "coordinates": {
+          "lat": 13.4443,
+          "lon": 144.6937
+        }
+      },
+      "lotNumber": "PICS-2025-1017-122",
+      "catchId": "catch-003",
+      "species": "Yellowfin Tuna",
+      "quantity": {
+        "weight": 850,
+        "unit": "kg",
+        "packages": 12,
+        "packageType": "Individually wrapped loins"
+      },
+      "received": "2025-10-17T18:00:00Z",
+      "expectedDeparture": "2025-10-20T22:00:00Z",
+      "temperature": {
+        "target": -60,
+        "current": -60.5,
+        "min": -62,
+        "max": -59.5,
+        "lastCheck": "2025-10-20T14:15:00Z",
+        "monitoringSystem": "Ultra-low temp monitoring",
+        "alertsActive": false
+      },
+      "quality": {
+        "grade": "Sashimi",
+        "freshnessScore": 99,
+        "coreTemp": -60,
+        "colorScore": 9.8,
+        "marbling": "Excellent",
+        "histamine": "<5ppm (safe)"
+      },
+      "certifications": ["HACCP", "FDA", "EU approved", "Japan MHLW"],
+      "operator": "Pacific Seafood Export Co",
+      "contact": {
+        "name": "Kenji Tanaka",
+        "phone": "+1-671-477-8899",
+        "email": "export@pacseafood.com"
+      },
+      "status": "Ready for shipment"
+    },
+    {
+      "id": "storage-005",
+      "facilityId": "FDA-MS-45678",
+      "facilityName": "Gulf Coast Seafood Processing",
+      "location": {
+        "address": "2500 Bayview Ave",
+        "city": "Biloxi",
+        "state": "Mississippi",
+        "zip": "39530",
+        "country": "USA",
+        "coordinates": {
+          "lat": 30.3960,
+          "lon": -88.8853
+        }
+      },
+      "lotNumber": "GCSP-2025-1020-056",
+      "catchId": "catch-005",
+      "species": "White Shrimp",
+      "quantity": {
+        "weight": 385,
+        "unit": "kg",
+        "packages": 77,
+        "packageType": "5lb IQF bags"
+      },
+      "received": "2025-10-20T11:30:00Z",
+      "expectedDeparture": "2025-10-23T00:00:00Z",
+      "temperature": {
+        "target": -18,
+        "current": -18.5,
+        "min": -19,
+        "max": -18,
+        "lastCheck": "2025-10-20T14:20:00Z",
+        "monitoringSystem": "Axiom Cold Chain",
+        "alertsActive": false
+      },
+      "quality": {
+        "grade": "U/15 count",
+        "freshnessScore": 97,
+        "headless": true,
+        "deveined": false,
+        "glazing": "10% water glaze",
+        "texture": "Firm"
+      },
+      "certifications": ["HACCP", "FDA", "BAP 4-star"],
+      "operator": "Mississippi Shrimp Processors",
+      "contact": {
+        "name": "Carlos Rodriguez",
+        "phone": "+1-228-374-5566",
+        "email": "processing@gulfshrimp.com"
+      },
+      "status": "Processing complete"
+    }
+  ]
+}

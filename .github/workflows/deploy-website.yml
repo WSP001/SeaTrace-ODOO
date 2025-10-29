@@ -1,0 +1,57 @@
+# Deploy SeaTrace Website to Production
+# Builds Next.js app and deploys to hosting platform
+# For the Commons Good 🌊
+
+name: Deploy Website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pages/**'
+      - 'styles/**'
+      - 'next.config.js'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy Website
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js app
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_BASE: https://api.seatrace.worldseafoodproducers.com
+          NEXT_PUBLIC_SITE_URL: https://seatrace.worldseafoodproducers.com
+
+      - name: Export static files
+        run: npm run export
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2.0
+        with:
+          publish-dir: './out'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: false
+          enable-commit-comment: true
+          overwrites-pull-request-comment: true
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        timeout-minutes: 10

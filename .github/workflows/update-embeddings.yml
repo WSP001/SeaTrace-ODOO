@@ -1,0 +1,79 @@
+name: Update Code Embeddings
+
+# Trigger: After PR merge to main, update semantic embeddings for code search
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'docs/**'
+      - 'README.md'
+      - '.github/scripts/create_embeddings.py'
+
+  workflow_dispatch:
+    inputs:
+      vector_db:
+        description: 'Vector database to use (pinecone, weaviate, local)'
+        required: false
+        default: 'local'
+        type: choice
+        options:
+          - pinecone
+          - weaviate
+          - local
+
+jobs:
+  update-embeddings:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better context
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r .github/embedding-requirements.txt
+
+      - name: Generate embeddings
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+          PINECONE_ENVIRONMENT: ${{ secrets.PINECONE_ENVIRONMENT }}
+          WEAVIATE_URL: ${{ secrets.WEAVIATE_URL }}
+          WEAVIATE_API_KEY: ${{ secrets.WEAVIATE_API_KEY }}
+          VECTOR_DB: ${{ inputs.vector_db || 'local' }}
+        run: |
+          python .github/scripts/create_embeddings.py \
+            --root . \
+            --index-name seatrace-index \
+            --vector-db $VECTOR_DB \
+            --output-dir .github/embeddings
+
+      - name: Upload embeddings artifact (local mode)
+        if: ${{ env.VECTOR_DB == 'local' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-embeddings
+          path: .github/embeddings/
+          retention-days: 90
+
+      - name: Summary
+        run: |
+          echo "✅ Embeddings updated successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Configuration:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Vector DB: $VECTOR_DB" >> $GITHUB_STEP_SUMMARY
+          echo "- Index Name: seatrace-index" >> $GITHUB_STEP_SUMMARY
+          echo "- Files processed: $(find src docs -type f \( -name '*.py' -o -name '*.md' -o -name '*.ts' \) | wc -l)" >> $GITHUB_STEP_SUMMARY

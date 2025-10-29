@@ -1,0 +1,152 @@
+# Argo CD Application for SeaTrace Demo
+# GitOps deployment manifest - replaces Azure App Service deployment status
+# 
+# For the Commons Good 🌊
+#
+# Usage:
+#   argocd app create -f ops/argocd/app-seatrace-demo.yaml
+#   argocd app get seatrace-demo
+#   argocd app sync seatrace-demo
+#
+# Status Verification (replaces Azure portal):
+#   - Sync Status: Synced (Git commit matches running state)
+#   - Health: Healthy (all resources operational)
+#   - Revision: <git-commit-sha>
+
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: seatrace-demo
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: seatrace
+    app.kubernetes.io/component: demo
+    app.kubernetes.io/part-of: seatrace-platform
+    governance.seatrace.io/pillar: "all-four"  # Autonomy, Accountability, Optimization, Collaboration
+  annotations:
+    notifications.argoproj.io/subscribe.on-sync-succeeded.slack: ops-seatrace
+    notifications.argoproj.io/subscribe.on-health-degraded.slack: ops-seatrace
+    notifications.argoproj.io/subscribe.on-sync-failed.slack: ops-seatrace
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+
+spec:
+  # Source repository (GitOps truth)
+  source:
+    repoURL: https://github.com/WSP001/SeaTrace-ODOO.git
+    targetRevision: main  # Track main branch for demo
+    path: k8s/demo        # Kubernetes manifests directory
+    
+    # Helm values override (if using Helm charts)
+    helm:
+      releaseName: seatrace-demo
+      valueFiles:
+        - values-demo.yaml
+      parameters:
+        - name: image.tag
+          value: "latest"  # Overridden by CI/CD
+        - name: replicaCount
+          value: "2"       # HA for demo
+        - name: ingress.enabled
+          value: "true"
+        - name: ingress.host
+          value: "seatrace.worldseafoodproducers.com"
+
+  # Destination cluster
+  destination:
+    server: https://kubernetes.default.svc  # In-cluster deployment
+    namespace: seatrace
+    
+  # Sync policy (GitOps automation)
+  syncPolicy:
+    automated:
+      prune: true      # Remove resources deleted from Git
+      selfHeal: true   # Auto-correct drift from manual changes
+      allowEmpty: false
+    
+    syncOptions:
+      - CreateNamespace=true     # Auto-create namespace if missing
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true          # Prune after successful sync
+      - RespectIgnoreDifferences=true
+      - ApplyOutOfSyncOnly=true
+    
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
+
+  # Ignore rules (prevent sync conflicts)
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas  # Allow HPA to control replicas
+    - group: ""
+      kind: Service
+      jsonPointers:
+        - /spec/clusterIP  # Preserve cluster IP on updates
+
+  # Health assessment (replaces Azure health checks)
+  revisionHistoryLimit: 10
+  
+  # Resource tracking
+  info:
+    - name: "Documentation"
+      value: "https://github.com/WSP001/SeaTrace-ODOO/blob/main/DEMO.md"
+    - name: "Grafana Dashboard"
+      value: "https://grafana.seatrace.worldseafoodproducers.com/d/seatrace-demo"
+    - name: "Prometheus Metrics"
+      value: "https://prometheus.seatrace.worldseafoodproducers.com"
+    - name: "Public Demo"
+      value: "https://seatrace.worldseafoodproducers.com/public"
+
+---
+# Project configuration (optional - for multi-app management)
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: seatrace-platform
+  namespace: argocd
+spec:
+  description: "SeaTrace Maritime Provenance Platform - Four Pillars Governance"
+  
+  # Allowed source repositories
+  sourceRepos:
+    - https://github.com/WSP001/SeaTrace-ODOO.git
+    - https://github.com/WSP001/SeaTrace003.git
+  
+  # Allowed destinations
+  destinations:
+    - namespace: seatrace
+      server: https://kubernetes.default.svc
+    - namespace: seatrace-staging
+      server: https://kubernetes.default.svc
+  
+  # Cluster resource allow list
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  
+  # Namespace resource allow list
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  
+  # Roles for RBAC
+  roles:
+    - name: master-admin
+      description: "Full admin access for Acting Master"
+      policies:
+        - p, proj:seatrace-platform:master-admin, applications, *, seatrace-platform/*, allow
+      groups:
+        - seatrace-masters
+    
+    - name: viewer
+      description: "Read-only access for investors/auditors"
+      policies:
+        - p, proj:seatrace-platform:viewer, applications, get, seatrace-platform/*, allow
+      groups:
+        - seatrace-viewers

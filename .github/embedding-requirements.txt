@@ -1,0 +1,8 @@
+# Python dependencies for semantic code embeddings generation
+# Used by .github/workflows/update-embeddings.yml
+
+openai>=1.0.0
+tqdm>=4.66.0
+tiktoken>=0.5.0
+pinecone-client>=3.0.0
+weaviate-client>=3.25.0

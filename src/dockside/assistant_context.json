@@ -1,0 +1,21 @@
+{
+  "module": "dockside",
+  "summary": "DockSide: Cold storage, reconciliation, merge/split semantics, computes recovery percentages and produces dock.origin_records.",
+  "entrypoint": "src.dockside.main:app",
+  "run_commands": [
+    "python -m uvicorn src.dockside.main:app --host 0.0.0.0 --port 8002"
+  ],
+  "test_command": "pytest tests/unit -q",
+  "important_files": [
+    {
+      "path": "src/building_lot/reconciliation.py",
+      "summary": "Reconciliation logic for incoming to finished products"
+    },
+    {
+      "path": "docs/pillars/dockside.md",
+      "summary": "DockSide design notes and recovery percentage guidance"
+    }
+  ],
+  "notes": "DockSide is where incoming raw supply maps to finished SKUs and recovery percentages are computed (H&G 70-75%, Fillet 50-60%). Keep cryptographic private keys out of repo.",
+  "last_updated": "2025-10-28"
+}

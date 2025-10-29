@@ -1,0 +1,28 @@
+# OpenSSL Configuration for worldseafoodproducers.com TLS Certificate
+# Usage: openssl req -new -key worldseafoodproducers_new.key -out worldseafoodproducers.csr -config san.cnf
+
+[ req ]
+default_bits       = 4096
+prompt             = no
+default_md         = sha256
+req_extensions     = req_ext
+distinguished_name = dn
+
+[ dn ]
+C  = US
+ST = Florida
+L  = Winter Haven
+O  = World Seafood Producers
+OU = IT Department
+CN = www.worldseafoodproducers.com
+
+[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = www.worldseafoodproducers.com
+DNS.2 = worldseafoodproducers.com
+
+# Optional: Add these if you need API subdomain covered by the same cert
+# DNS.3 = api.worldseafoodproducers.com
+# DNS.4 = seatrace.worldseafoodproducers.com

@@ -1,0 +1,21 @@
+{
+  "module": "seaside",
+  "summary": "SeaSide: Vessel tracking and chain originator (Sentinels). Produces sea.gfw.traces.",
+  "entrypoint": "src.seaside.main:app",
+  "run_commands": [
+    "python -m uvicorn src.seaside.main:app --host 0.0.0.0 --port 8000"
+  ],
+  "test_command": "pytest tests/unit -q",
+  "important_files": [
+    {
+      "path": "src/a2a_handlers/seaside_handler.py",
+      "summary": "Creates origin packets and publishes to Kafka (sea.gfw.traces)"
+    },
+    {
+      "path": "tests/unit/a2a_handlers/test_seaside_handler.py",
+      "summary": "Unit tests for seaside handler"
+    }
+  ],
+  "notes": "SeaSide is the origin of the packet stream. Do not store private keys in repo. See PROJECT_MANIFEST.json for canonical mapping.",
+  "last_updated": "2025-10-28"
+}

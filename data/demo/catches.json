@@ -1,0 +1,286 @@
+{
+  "catches": [
+    {
+      "id": "catch-001",
+      "ticketNumber": "AK-2025-BS-1234",
+      "vesselId": "vessel-001",
+      "vesselName": "Pacific Star",
+      "species": {
+        "common": "Alaska Pollock",
+        "scientific": "Gadus chalcogrammus",
+        "code": "POL",
+        "faoCode": "WPO"
+      },
+      "catch": {
+        "weight": 45000,
+        "unit": "kg",
+        "count": null,
+        "grade": "A"
+      },
+      "location": {
+        "lat": 55.3,
+        "lon": -166.2,
+        "zone": "Bering Sea - BSAI",
+        "depth": 250,
+        "description": "Eastern Bering Sea Shelf"
+      },
+      "timestamp": "2025-10-20T10:30:00Z",
+      "gpsVerified": true,
+      "quotaInfo": {
+        "quotaUsed": 45000,
+        "quotaRemaining": 155000,
+        "quotaType": "Community Development Quota (CDQ)"
+      },
+      "compliance": {
+        "meshSize": 90,
+        "meshSizeCompliant": true,
+        "bycatchPercent": 2.1,
+        "prohibitedSpecies": "None detected",
+        "observerPresent": true
+      },
+      "observer": {
+        "name": "John Martinez",
+        "id": "NMFS-OBS-8821",
+        "signature": "0x8f3e2a1..."
+      },
+      "certifications": ["MSC-F-12345"],
+      "status": "Validated"
+    },
+    {
+      "id": "catch-002",
+      "ticketNumber": "ME-2025-GT-4521",
+      "vesselId": "vessel-002",
+      "vesselName": "Northern Dawn",
+      "species": {
+        "common": "Atlantic Cod",
+        "scientific": "Gadus morhua",
+        "code": "COD",
+        "faoCode": "COD"
+      },
+      "catch": {
+        "weight": 1250,
+        "unit": "kg",
+        "count": 342,
+        "grade": "A"
+      },
+      "location": {
+        "lat": 42.5,
+        "lon": -67.2,
+        "zone": "ICES Area 5Y",
+        "depth": 85,
+        "description": "Georges Bank"
+      },
+      "timestamp": "2025-10-18T11:30:00Z",
+      "gpsVerified": true,
+      "quotaInfo": {
+        "quotaUsed": 1250,
+        "quotaRemaining": 3200,
+        "quotaType": "Days-at-sea allocation"
+      },
+      "compliance": {
+        "meshSize": 140,
+        "meshSizeCompliant": true,
+        "bycatchPercent": 3.2,
+        "prohibitedSpecies": "None",
+        "sizeLimit": 43,
+        "sizeLimitCompliant": true,
+        "observerPresent": true
+      },
+      "observer": {
+        "name": "Sarah Johnson",
+        "id": "NMFS-OBS-4521",
+        "signature": "0x7a2c9f4..."
+      },
+      "certifications": ["MSC-COC-67890"],
+      "status": "Validated"
+    },
+    {
+      "id": "catch-003",
+      "ticketNumber": "HI-2025-LL-8842",
+      "vesselId": "vessel-003",
+      "vesselName": "Ocean Voyager",
+      "species": {
+        "common": "Yellowfin Tuna",
+        "scientific": "Thunnus albacares",
+        "code": "YFT",
+        "faoCode": "YFT"
+      },
+      "catch": {
+        "weight": 850,
+        "unit": "kg",
+        "count": 12,
+        "grade": "Sashimi"
+      },
+      "location": {
+        "lat": 15.2,
+        "lon": 145.8,
+        "zone": "Western Pacific",
+        "depth": 180,
+        "description": "Marianas Trench vicinity"
+      },
+      "timestamp": "2025-10-17T06:15:00Z",
+      "gpsVerified": true,
+      "quotaInfo": {
+        "quotaUsed": 850,
+        "quotaRemaining": 12150,
+        "quotaType": "WCPFC Bigeye allocation"
+      },
+      "compliance": {
+        "hookType": "Circle hooks (required)",
+        "hookCompliant": true,
+        "bycatchPercent": 0.8,
+        "prohibitedSpecies": "1 sea turtle (released alive)",
+        "observerPresent": false,
+        "electronicMonitoring": true
+      },
+      "certifications": ["MSC", "Dolphin Safe DS-2025-4421"],
+      "quality": {
+        "coreTemp": 1.5,
+        "bloodlineRemoved": true,
+        "processingMethod": "Flash frozen at sea",
+        "freshnessScore": 99
+      },
+      "status": "Validated"
+    },
+    {
+      "id": "catch-004",
+      "ticketNumber": "AK-2025-SS-1019",
+      "vesselId": "vessel-004",
+      "vesselName": "Bristol Bay Runner",
+      "species": {
+        "common": "Sockeye Salmon",
+        "scientific": "Oncorhynchus nerka",
+        "code": "SOS",
+        "faoCode": "RDS"
+      },
+      "catch": {
+        "weight": 6804,
+        "unit": "kg",
+        "count": 1512,
+        "grade": "Premium"
+      },
+      "location": {
+        "lat": 58.7,
+        "lon": -157.3,
+        "zone": "Bristol Bay",
+        "depth": 0,
+        "description": "Nushagak River District"
+      },
+      "timestamp": "2025-10-19T04:30:00Z",
+      "gpsVerified": true,
+      "quotaInfo": {
+        "quotaUsed": 6804,
+        "quotaRemaining": 45000,
+        "quotaType": "Bristol Bay setnet allocation"
+      },
+      "compliance": {
+        "gearType": "Beach seine setnet",
+        "gearCompliant": true,
+        "escapementCount": 125000,
+        "escapementTarget": 100000,
+        "escapementMet": true
+      },
+      "quality": {
+        "fatContent": 12.5,
+        "colorScore": 9.2,
+        "freshnessScore": 98,
+        "parasiteCheck": "Pass"
+      },
+      "certifications": ["MSC", "Alaska RFM"],
+      "status": "Validated"
+    },
+    {
+      "id": "catch-005",
+      "ticketNumber": "MS-2025-SH-3344",
+      "vesselId": "vessel-005",
+      "vesselName": "Gulf Princess",
+      "species": {
+        "common": "White Shrimp",
+        "scientific": "Litopenaeus setiferus",
+        "code": "WSH",
+        "faoCode": "WHX"
+      },
+      "catch": {
+        "weight": 385,
+        "unit": "kg",
+        "count": null,
+        "grade": "U/15 count"
+      },
+      "location": {
+        "lat": 29.2,
+        "lon": -88.5,
+        "zone": "Gulf of Mexico",
+        "depth": 45,
+        "description": "Mississippi Sound"
+      },
+      "timestamp": "2025-10-20T09:15:00Z",
+      "gpsVerified": true,
+      "quotaInfo": {
+        "quotaUsed": 385,
+        "quotaRemaining": 8500,
+        "quotaType": "State waters permit"
+      },
+      "compliance": {
+        "tedInstalled": true,
+        "brdInstalled": true,
+        "bycatchPercent": 15.2,
+        "prohibitedSpecies": "None"
+      },
+      "quality": {
+        "headOn": false,
+        "iceTemperature": 0.5,
+        "landingCondition": "Excellent"
+      },
+      "certifications": ["TED Certified", "BRD Certified"],
+      "status": "Validated"
+    },
+    {
+      "id": "catch-006",
+      "ticketNumber": "NS-2025-LOB-5567",
+      "vesselId": "vessel-006",
+      "vesselName": "Atlantic Harvest",
+      "species": {
+        "common": "American Lobster",
+        "scientific": "Homarus americanus",
+        "code": "LOB",
+        "faoCode": "LBA"
+      },
+      "catch": {
+        "weight": 185,
+        "unit": "kg",
+        "count": 124,
+        "grade": "Market size"
+      },
+      "location": {
+        "lat": 43.8,
+        "lon": -66.1,
+        "zone": "LFA 34",
+        "depth": 35,
+        "description": "Bay of Fundy"
+      },
+      "timestamp": "2025-10-20T10:45:00Z",
+      "gpsVerified": true,
+      "quotaInfo": {
+        "quotaUsed": 185,
+        "quotaRemaining": 2500,
+        "quotaType": "Individual trap limit"
+      },
+      "compliance": {
+        "trapCount": 250,
+        "trapLimit": 300,
+        "vNotchCount": 8,
+        "eggBearingFemales": 5,
+        "eggBearingReleased": 5,
+        "undersizeReleased": 12,
+        "carapaceLengthMin": 82.5
+      },
+      "quality": {
+        "hardShell": true,
+        "softShellPercent": 5,
+        "vitality": "High"
+      },
+      "certifications": ["MSC", "Ocean Wise"],
+      "status": "Validated"
+    }
+  ]
+}

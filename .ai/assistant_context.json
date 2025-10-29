@@ -1,0 +1,165 @@
+{
+  "repo_name": "SeaTrace-ODOO",
+  "owner": "WSP001",
+  "default_branch": "main",
+  "repository_type": "PUBLIC - Commons Good Documentation & Infrastructure",
+  "top_level_summary": "SeaTrace PUBLIC repository for Commons Good: Four Pillars architecture (SeaSide FREE, DeckSide/DockSide/MarketSide DUAL KEY). Reference WORKSPACE_DIRECTORY_MAP.md for 20+ workspaces (7-year history) and PROCEEDING_TEAM_DISCOVERIES.md for validation of 3-pillar monetization strategy against original PK1/PK2/PK3 design.",
+  
+  "architecture_overview": {
+    "four_pillars": {
+      "seaside": "PUBLIC ONLY 🔓 - Vessel tracking, AIS overlay, THREE CRITICAL TRIP MOMENTS (departure, catch event, return)",
+      "deckside": "DUAL KEY 🔓🔐 - THE FORK: PUBLIC #CATCH (basic compliance) vs PRIVATE $CHECK (precise measurements, species ML 96% accuracy)",
+      "dockside": "DUAL KEY 🔓🔐 - THE SECOND FORK: PUBLIC #STORE (basic inventory) vs PRIVATE $STORE (fish ticket indexing, H&G/fillet recovery %, temperature logs, 33% cost savings)",
+      "marketside": "DUAL KEY 🔓🔐 - THE THIRD FORK: PUBLIC QR verification vs PRIVATE trading platform (price discovery, settlement, WebSocket real-time)"
+    },
+    "business_model": {
+      "revenue": "$120,385/month ($1.44M/year)",
+      "profit_margin": "93.9%",
+      "cross_subsidy": "34:1 (PRIVATE funds FREE)",
+      "free_tier_roi": "3,422%",
+      "pillars_monetized": "3 of 4 (DeckSide + DockSide + MarketSide PAID)"
+    },
+    "proceeding_team_validation": {
+      "pk1_vessel_keys": "DeckSide Processing Account (VALIDATED ✅)",
+      "pk2_facility_keys": "DockSide Storage Account (ROBERTO'S DISCOVERY ✅)",
+      "pk3_market_keys": "MarketSide Trading Account (VALIDATED ✅)",
+      "packet_switching_handler": "SeaTrace002/services/seaside/packet_handler.py (FOUND ✅)"
+    }
+  },
+
+  "entry_points": [
+    "README.md - Four Pillars architecture overview",
+    "docs/WORKSPACE_DIRECTORY_MAP.md - 20+ workspaces spanning 7 years (Jan 2025-Oct 2025)",
+    "docs/PROCEEDING_TEAM_DISCOVERIES.md - Business model validation (27KB, 800+ lines)",
+    "docs/VALIDATION_REPORT.md - Comprehensive review of all discoveries (1000+ lines)",
+    "docs/BUSINESS_MODEL_ECONOMICS.md - P&L analysis ($120K/month, 93.9% margin)",
+    "docs/PR_COMBINED_WORK.md - Complete PR description and commit strategy"
+  ],
+
+  "important_files": [
+    {
+      "path": "docs/WORKSPACE_DIRECTORY_MAP.md",
+      "summary": "Comprehensive map of 20+ SeaTrace workspaces from Jan 2025-Oct 2025. Critical for understanding PROCEEDING team's 7-year work spanning SeaTrace002 (MVP), SEATRACE_MASTER (recovery plan), seatrace-team (MasterCode Citations), and current SeaTrace-ODOO (PUBLIC) + SeaTrace-ODOO-Private repos."
+    },
+    {
+      "path": "docs/PROCEEDING_TEAM_DISCOVERIES.md",
+      "summary": "27KB validation document proving Roberto's 3-pillar monetization strategy matches PROCEEDING team's original PK1/PK2/PK3 (Vessel/Facility/Market Keys) architecture. Contains evidence from SEATRACE_MASTER/RECOVERY_PLAN.md and SeaTrace002/docs/fishery/institutional_flow.md showing 'secret key access system' was designed from inception."
+    },
+    {
+      "path": "docs/VALIDATION_REPORT.md",
+      "summary": "1000+ line comprehensive review validating all business model claims, DockSide features (DS2: Inventory Control = fish ticket indexing, DS3: Temperature Log = storage standards), packet switching handler, and business economics. Confirms 3/4 pillars monetized (not 1.5/4)."
+    },
+    {
+      "path": "docs/BUSINESS_MODEL_ECONOMICS.md",
+      "summary": "P&L analysis showing $120K/month revenue, $113K/month profit (93.9% margin), 34:1 cross-subsidy ratio, and 3,422% FREE tier ROI. Validates that Commons Good (FREE SeaSide) is sustainable and highly profitable."
+    },
+    {
+      "path": "docs/security/INCIDENT_2025-10-28_TLS_EXPOSURE.md",
+      "summary": "Security incident report for exposed TLS certificate/private key for www.worldseafoodproducers.com. Contains remediation checklist, Netfirms 502 troubleshooting, and migration recommendation to Netlify for automated Let's Encrypt certificates."
+    },
+    {
+      "path": "README.md",
+      "summary": "Four Pillars architecture with PUBLIC/PRIVATE fork strategy, NGO/GFW API v3 integration, DockSide DUAL KEY features (fish ticket indexing, H&G/fillet recovery %), and Commons Charter. Grew from 53 lines → 678 lines (+409% expansion)."
+    },
+    {
+      "path": ".github/CODEOWNERS",
+      "summary": "Protects Postman/CI files requiring @WSP001 approval. Ensures security guardrails and Commons Good compliance checks cannot be bypassed."
+    },
+    {
+      "path": ".github/workflows/postman-smoke.yml",
+      "summary": "Newman automated API testing for Four Pillars endpoints. Validates PUBLIC endpoints have no precise GPS/pricing data (Commons Good compliance)."
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "summary": "Gitleaks secret scanning pre-commit hook. Custom policy pass to prevent TLS certificate/private key exposure in commits."
+    },
+    {
+      "path": "scripts/public/purge_deckside.ps1",
+      "summary": "Migration helper for moving DeckSide PRIVATE features to SeaTrace-ODOO-Private repo. Creates branch, documents removal, and provides safe dry-run mode."
+    }
+  ],
+
+  "critical_discoveries": {
+    "seatrace_master_recovery_plan": {
+      "file": "SEATRACE_MASTER/RECOVERY_PLAN.md (Feb 2025)",
+      "finding": "Documents 'Secret key access system' and Four Pillars architecture from inception. Proves PUBLIC/PRIVATE key fork strategy was original design, not recent addition."
+    },
+    "institutional_flow_pk_architecture": {
+      "file": "SeaTrace002/docs/fishery/institutional_flow.md (Dec 2024)",
+      "finding": "THREE PRIVATE KEY TYPES: PK1 (Vessel Keys) for DeckSide, PK2 (Facility Keys) for DockSide, PK3 (Market Keys) for MarketSide. Validates Roberto's insight that DockSide is THE SECOND FORK with fish ticket indexing (DS2: Inventory Control)."
+    },
+    "dockside_features_validation": {
+      "file": "SeaTrace002/docs/fishery/institutional_flow.md - Modular Account Integration diagram",
+      "finding": "DS2 (Inventory Control) = Fish ticket indexing with standard tally weights. DS3 (Temperature Log) = Storage standards for spoilage risk. Economies of scale = 33% cost reduction via aggregated data. 100% matches Roberto's specifications."
+    },
+    "packet_switching_handler": {
+      "files": [
+        "SeaTrace002/services/seaside/packet_handler.py (MVP)",
+        "SeaTrace003/src/crypto/packet_encryptor.py (PRIVATE tier)",
+        "SeaTrace-ODOO/src/security/packet_crypto.py (current production)"
+      ],
+      "finding": "PKV (Validation System) routes single data stream to PUBLIC (#KEY) vs PRIVATE ($KEY) operations. Core innovation: No data duplication, same infrastructure serves both tiers."
+    }
+  },
+
+  "run_commands": [
+    "scripts/environment_doctor.ps1 - Validates development environment setup",
+    "scripts/preflight.ps1 - Pre-commit validation (gitleaks, buf, newman, k6)",
+    "scripts/Verify-Public-Separation.ps1 - Ensures no PRIVATE data in PUBLIC repo",
+    "scripts/audit-separation.ps1 - Audits PUBLIC/PRIVATE separation compliance"
+  ],
+
+  "test_command": "pytest -q tests/",
+  "build_command": "npm run build && npm run export",
+  "deploy_command": "netlify deploy --prod --dir=out",
+
+  "security_posture": {
+    "active_incidents": [
+      {
+        "id": "INCIDENT_2025-10-28_TLS_EXPOSURE",
+        "severity": "HIGH",
+        "status": "CONTAINMENT IN PROGRESS",
+        "description": "TLS certificate and private key exposed for www.worldseafoodproducers.com. Requires immediate rotation and revocation (Serial: d9b7b2690ecce57cd588b18abd020942).",
+        "remediation": "See docs/security/INCIDENT_2025-10-28_TLS_EXPOSURE.md for complete remediation checklist and Netfirms/Cloudflare/Sectigo procedures."
+      }
+    ],
+    "pre_commit_hooks": [
+      "gitleaks - Secret detection (certificates, private keys, API tokens)",
+      "detect-secrets - Additional secret scanning patterns",
+      "buf lint - Protobuf schema validation",
+      "prettier - Code formatting"
+    ],
+    "ci_security_checks": [
+      "Newman Postman smoke tests - Validates PUBLIC endpoints have no precise GPS/pricing",
+      "k6 performance tests - Rate limiting and burst protection",
+      "gitleaks CI scan - Prevents secrets in PR commits"
+    ]
+  },
+
+  "dockside_processing_context": {
+    "incoming_fork": "SeaSide catch event → DeckSide processing → DockSide receiving (fish ticket indexing with standard tally weights, PUBLIC KEY for basic compliance + PRIVATE KEY for precise measurements)",
+    "reconciliation": "DockSide DS2 (Inventory Control) correlates incoming raw supply with outgoing finished products. H&G (Headed & Gutted) = ~70-75% recovery, Filleting = ~50-60% recovery, Skin removal = additional ~5-10% loss. LOGIC DICTATES EVEN HIGHER RECOVERY % LOSS when factoring price adjustments.",
+    "outgoing_fork": "DockSide → MarketSide finished seafood products with SKU generation, consumer QR codes, and blockchain immutability linking back to original catch. Proportional usage calculations apply economies of scale (33% cost savings from $0.12/lb → $0.08/lb storage).",
+    "economies_of_scale": "F/V 000 (demo) → F/V 001 (pilot) → Full Commercial F/V 4.2M scale (under 15M and over 15M vessels). Manual duplicated work transformed to automated EMR efficiency."
+  },
+
+  "next_round_deferred": [
+    "Vector embeddings pipeline (.github/workflows/update-embeddings.yml + .github/scripts/create_embeddings.py)",
+    "Devcontainer setup (.devcontainer/Dockerfile + devcontainer.json)",
+    "Postman collection expansion (full E2E Four Pillars demo)",
+    "assistant_context.json wiring with vector DB (Pinecone/Weaviate)",
+    "Sequential demo runs (4-pillar cards emulation)",
+    "HashiCorp Vault / AWS Secrets Manager integration",
+    "Automated certificate renewal (Let's Encrypt)",
+    "Certificate transparency monitoring"
+  ],
+
+  "commons_charter": {
+    "free_tier": "SeaSide PUBLIC 🔓 - F/V Master AIS overlay with THREE CRITICAL TRIP MOMENTS. NGO/GFW API v3 integration for transparency and accountability.",
+    "paid_tiers": "DeckSide/DockSide/MarketSide DUAL KEY 🔓🔐 - PRIVATE features fund FREE tier via 34:1 cross-subsidy. 3,422% ROI on Commons Good proves sustainability.",
+    "philosophy": "For the Commons Good: Provide free vessel tracking and basic compliance tools to all fisheries, funded by premium features (species ML, fish ticket indexing, yield optimization, trading platform) for commercial operators."
+  },
+
+  "last_updated": "2025-10-28",
+  "agent_instructions": "ALWAYS read this assistant_context.json first. Reference PROCEEDING_TEAM_DISCOVERIES.md for business model validation. Check INCIDENT_2025-10-28_TLS_EXPOSURE.md for active security incidents. Never commit secrets - use gitleaks pre-commit hook. For DockSide questions, remember: DS2 = fish ticket indexing, DS3 = temperature logs, recovery % = H&G (70-75%) vs fillets (50-60%). Packet switching handler routes PUBLIC (#KEY) vs PRIVATE ($KEY) from single data source."
+}

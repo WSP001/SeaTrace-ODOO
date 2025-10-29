@@ -1,14 +1,39 @@
 # SeaTrace-ODOO Public Repo Code Owners
+# For the Commons Good! 🌊🏈
 # Prevent accidental leakage of sensitive files
 
-# Default owners
-* @wsp-security @seatrace-ops
+# Default owners (all files require @WSP001 review for main branch)
+* @WSP001
+
+# Public documentation (maintainers can modify)
+/docs/*.md @WSP001
+/docs/CRYPTO_QUICK_START.md @WSP001
+/docs/KEY_MANAGEMENT_ARCHITECTURE.md @WSP001
+/docs/PUBLIC_PRIVATE_KEY_DEVELOPMENT_GUIDE.md @WSP001
+/.github/copilot-instructions.md @WSP001
+
+# Commons Good API collateral
+/postman/** @WSP001
+/.github/workflows/postman-smoke.yml @WSP001
 
 # Verify keys (public, but require review)
-/docs/licensing/verify-keys.json @seatrace-ops
+/docs/licensing/verify-keys.json @WSP001
 
-# Block these paths in public repo (should only be in private)
-/src/emr/** @wsp-security @seatrace-ops
-/src/marketside/licensing/entitlements.py @wsp-security @seatrace-ops
-/docs/licensing/PRIVATE-LIMITED.md @wsp-leadership
-/docs/marketing/INVESTOR_PROSPECTUS.md @wsp-leadership
+# Security modules (require security review)
+/src/security/** @WSP001
+/scripts/Verify-Public-Separation.ps1 @WSP001
+
+# SENSITIVE PATHS - Should NOT exist in PUBLIC repo
+# If these appear, require manual review before merge
+/docs/licensing/PRIVATE-LIMITED.md @WSP001
+/docs/marketing/INVESTOR_PROSPECTUS.md @WSP001
+/src/marketside/licensing/entitlements.py @WSP001
+/PRIVATE_ENTITLEMENTS_HANDOFF.md @WSP001
+/src/emr/meter_private.py @WSP001
+
+# Private keys - NEVER commit
+*.key @WSP001
+*.pem @WSP001
+*.p12 @WSP001
+.env @WSP001
+secrets/** @WSP001

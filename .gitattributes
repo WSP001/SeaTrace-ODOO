@@ -1,0 +1,3 @@
+postman/backup/** export-ignore
+infra/** export-ignore
+scripts/private/** export-ignore

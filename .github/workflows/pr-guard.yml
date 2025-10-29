@@ -1,0 +1,68 @@
+name: PR Guard
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+
+jobs:
+  pr-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install system deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install python dev deps
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
+          pip install pre-commit
+
+      - name: Run pre-commit hooks
+        run: pre-commit run --all-files
+
+      - name: Gitleaks secret scan
+        uses: zricethezav/gitleaks-action@v1
+        with:
+          args: detect --source . --config .gitleaks-seatrace.toml --report-format json --report-path=gitleaks-report.json --redact
+
+      - name: Upload gitleaks report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitleaks-report
+          path: gitleaks-report.json
+
+      - name: Run tests
+        run: |
+          if [ -f pytest.ini ] || ls tests 2>/dev/null; then pytest -q; else echo "No tests found, skipping."; fi
+
+      - name: Run Newman (Postman collection) if present
+        run: |
+          if [ -f postman/collection.json ]; then
+            docker run --rm -v ${{ github.workspace }}:/etc/newman -w /etc/newman postman/newman:5.3.3 run postman/collection.json -e postman/environment.json || (echo "Newman failed" && exit 1)
+          else
+            echo "No Postman collection found; skipping Newman."
+          fi

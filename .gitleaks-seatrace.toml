@@ -1,0 +1,197 @@
+title = "SeaTrace Gitleaks Configuration - Tuned for Four-Pillar Architecture"
+# Last Updated: 2025-10-28
+# Purpose: Prevent accidental commit of secrets (private keys, API tokens, certificates)
+# Usage: gitleaks detect --source . --report-format json --report-path .gitleaks-report.json --redact
+
+# ============================================================================
+# GLOBAL ALLOWLIST (Safe to commit)
+# ============================================================================
+[allowlist]
+description = "Global Allowlist for Public Docs and Test Fixtures"
+paths = [
+	# Public documentation
+	"docs/pillars/*",
+	"docs/PROCEEDING_TEAM_DISCOVERIES.md",
+	"docs/WORKSPACE_DIRECTORY_MAP.md",
+	"docs/BUSINESS_MODEL_ECONOMICS.md",
+	
+	# Security incident documentation (references only, no actual keys)
+	"docs/security/INCIDENT_*.md",
+	"docs/security/SECTIGO_REVOCATION_REQUEST.md",
+	"docs/security/NETFIRMS_SUPPORT_TICKET.md",
+	
+	# Test fixtures (mock keys for testing)
+	"tests/fixtures/*",
+	"tests/unit/*",
+	
+	# Configuration examples
+	".env.example",
+	"*.example.env",
+]
+
+# ============================================================================
+# PRIVATE KEY RULES (Ed25519, RSA, ECDSA)
+# ============================================================================
+[[rules]]
+description = "Ed25519 Private Key (SeaTrace uses Ed25519 for all signing)"
+id = "ed25519-private-key"
+regex = '''-----BEGIN OPENSSH PRIVATE KEY-----'''
+tags = ["key", "ed25519", "private", "critical"]
+
+[[rules]]
+description = "RSA Private Key (Legacy TLS certificates)"
+id = "rsa-private-key"
+regex = '''-----BEGIN (RSA )?PRIVATE KEY-----'''
+tags = ["key", "rsa", "private", "critical"]
+
+[[rules]]
+description = "ECDSA Private Key"
+id = "ecdsa-private-key"
+regex = '''-----BEGIN EC PRIVATE KEY-----'''
+tags = ["key", "ecdsa", "private", "critical"]
+
+[[rules]]
+description = "Encrypted Private Key"
+id = "encrypted-private-key"
+regex = '''-----BEGIN ENCRYPTED PRIVATE KEY-----'''
+tags = ["key", "encrypted", "private", "critical"]
+
+# ============================================================================
+# API KEYS & TOKENS
+# ============================================================================
+[[rules]]
+description = "OpenAI API Key (sk-proj-...)"
+id = "openai-api-key"
+regex = '''sk-proj-[a-zA-Z0-9]{20,}'''
+tags = ["api", "openai", "high-severity"]
+
+[[rules]]
+description = "GitHub Personal Access Token (ghp_...)"
+id = "github-token"
+regex = '''ghp_[0-9a-zA-Z]{36,}'''
+tags = ["api", "github", "high-severity"]
+
+[[rules]]
+description = "AWS Access Key ID"
+id = "aws-access-key-id"
+regex = '''AKIA[0-9A-Z]{16}'''
+tags = ["aws", "key", "high-severity"]
+
+[[rules]]
+description = "AWS Secret Access Key"
+id = "aws-secret-access-key"
+regex = '''(?i)aws_secret_access_key[^\S\r\n]*[:=][^\S\r\n]*['"]?[A-Za-z0-9/+=]{40}['"]?'''
+tags = ["aws", "secret", "high-severity"]
+
+[[rules]]
+description = "Azure Storage Account Key"
+id = "azure-storage-key"
+regex = '''(?i)(?:azure|storage)(?:_|-)?(?:account|key)[^\S\r\n]*[:=][^\S\r\n]*['"]?[A-Za-z0-9+/=]{88}['"]?'''
+tags = ["azure", "storage", "high-severity"]
+
+[[rules]]
+description = "Pinecone API Key"
+id = "pinecone-api-key"
+regex = '''(?i)pinecone[^\S\r\n]*(?:api)?[^\S\r\n]*key[^\S\r\n]*[:=][^\S\r\n]*['"]?[a-z0-9\-]{36,}['"]?'''
+tags = ["api", "pinecone", "medium-severity"]
+
+[[rules]]
+description = "Generic API Key Pattern"
+id = "generic-api-key"
+regex = '''(?i)(?:api|token|secret|password)_?key[^\S\r\n]*[:=][^\S\r\n]*['"]?[0-9a-z\-_]{32,}['"]?'''
+tags = ["key", "api", "generic"]
+
+# ============================================================================
+# SEATRACE-SPECIFIC PRIVATE KEYS (Environment Variables)
+# ============================================================================
+[[rules]]
+description = "SeaSide Private Key (SEASIDE_PRIVATE_KEY)"
+id = "seaside-private-key-env"
+regex = '''(?i)SEASIDE_PRIVATE_KEY[^\S\r\n]*[:=][^\S\r\n]*['"]?[A-Za-z0-9+/=]{64,}['"]?'''
+tags = ["seatrace", "seaside", "private-key", "critical"]
+
+[[rules]]
+description = "DeckSide Private Key (DECKSIDE_PRIVATE_KEY)"
+id = "deckside-private-key-env"
+regex = '''(?i)DECKSIDE_PRIVATE_KEY[^\S\r\n]*[:=][^\S\r\n]*['"]?[A-Za-z0-9+/=]{64,}['"]?'''
+tags = ["seatrace", "deckside", "private-key", "critical"]
+
+[[rules]]
+description = "DockSide Private Key (DOCKSIDE_PRIVATE_KEY)"
+id = "dockside-private-key-env"
+regex = '''(?i)DOCKSIDE_PRIVATE_KEY[^\S\r\n]*[:=][^\S\r\n]*['"]?[A-Za-z0-9+/=]{64,}['"]?'''
+tags = ["seatrace", "dockside", "private-key", "critical"]
+
+[[rules]]
+description = "MarketSide Private Key (MARKETSIDE_PRIVATE_KEY)"
+id = "marketside-private-key-env"
+regex = '''(?i)MARKETSIDE_PRIVATE_KEY[^\S\r\n]*[:=][^\S\r\n]*['"]?[A-Za-z0-9+/=]{64,}['"]?'''
+tags = ["seatrace", "marketside", "private-key", "critical"]
+
+[[rules]]
+description = "SeaTrace HMAC Key (SEATRACE_HMAC_KEY)"
+id = "seatrace-hmac-key"
+regex = '''(?i)SEATRACE_HMAC_KEY[^\S\r\n]*[:=][^\S\r\n]*['"]?[A-Za-z0-9+/=]{32,}['"]?'''
+tags = ["seatrace", "hmac", "critical"]
+
+# ============================================================================
+# TLS CERTIFICATE SERIAL NUMBERS (Incident Response)
+# ============================================================================
+[[rules]]
+description = "TLS Certificate Serial Number (Incident Tracking)"
+id = "tls-cert-serial"
+regex = '''(?i)(?:serial|cert_serial|certificate_serial)[^\S\r\n]*[:=]?[^\S\r\n]*[a-f0-9]{32,40}'''
+tags = ["tls", "certificate", "serial", "incident"]
+
+[rules.allowlist]
+description = "Allow serial numbers in incident documentation (references only)"
+paths = [
+	"docs/security/INCIDENT_*.md",
+	"docs/security/SECTIGO_REVOCATION_REQUEST.md",
+]
+
+# ============================================================================
+# DATABASE CONNECTION STRINGS
+# ============================================================================
+[[rules]]
+description = "PostgreSQL Connection String"
+id = "postgresql-connection-string"
+regex = '''(?i)postgres(?:ql)?://[^\s'"]+:[^\s'"]+@[^\s'"]+'''
+tags = ["database", "postgresql", "high-severity"]
+
+[[rules]]
+description = "MongoDB Connection String"
+id = "mongodb-connection-string"
+regex = '''(?i)mongodb(?:\+srv)?://[^\s'"]+:[^\s'"]+@[^\s'"]+'''
+tags = ["database", "mongodb", "high-severity"]
+
+# ============================================================================
+# JWT TOKENS
+# ============================================================================
+[[rules]]
+description = "JWT Token (eyJ...)"
+id = "jwt-token"
+regex = '''eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}'''
+tags = ["jwt", "token", "medium-severity"]
+
+[rules.allowlist]
+description = "Allow JWT examples in documentation"
+paths = [
+	"docs/*",
+	"tests/fixtures/*",
+]
+
+# ============================================================================
+# SSH PRIVATE KEYS
+# ============================================================================
+[[rules]]
+description = "SSH Private Key (id_rsa, id_ed25519)"
+id = "ssh-private-key"
+regex = '''-----BEGIN (OPENSSH|RSA|DSA|EC) PRIVATE KEY-----'''
+tags = ["ssh", "private-key", "critical"]
+
+# ============================================================================
+# OPTIONS
+# ============================================================================
+[options]
+max_line_length = 1000  # Longer lines to avoid false positives in long URLs

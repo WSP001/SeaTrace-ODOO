@@ -1,0 +1,25 @@
+{
+  "module": "deckside",
+  "summary": "DeckSide: Catch recording, QR issuance, first fork (public/private) and creation of deck.minds_eye packets.",
+  "entrypoint": "src.deckside.main:app",
+  "run_commands": [
+    "python -m uvicorn src.deckside.main:app --host 0.0.0.0 --port 8001"
+  ],
+  "test_command": "pytest tests/unit -q",
+  "important_files": [
+    {
+      "path": "src/a2a_handlers/deckside_handler.py",
+      "summary": "DeckSide packet handler / validation"
+    },
+    {
+      "path": "src/deckside/qrcode.py",
+      "summary": "QR creation & verification for catches"
+    },
+    {
+      "path": "tests/unit/deckside/test_deckside_handler.py",
+      "summary": "Unit tests for DeckSide behavior"
+    }
+  ],
+  "notes": "DeckSide implements public catch records and private tallied signatures for licensed users. Ensure OpenAPI docs are updated when adding fields.",
+  "last_updated": "2025-10-28"
+}

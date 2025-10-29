@@ -1,0 +1,190 @@
+{
+  "vessels": [
+    {
+      "id": "vessel-001",
+      "name": "Pacific Star",
+      "imo": "9123456",
+      "mmsi": "367123456",
+      "flag": "USA",
+      "callSign": "WDF1234",
+      "operator": "Bering Sea Fisheries Co-op",
+      "homePort": "Dutch Harbor, Alaska",
+      "license": {
+        "number": "AK-COM-2025-00123",
+        "type": "Commercial Fishing",
+        "expires": "2025-12-31",
+        "issuer": "Alaska Department of Fish & Game"
+      },
+      "currentPosition": {
+        "lat": 55.3,
+        "lon": -166.2,
+        "speed": 4.2,
+        "heading": 245,
+        "timestamp": "2025-10-20T14:30:00Z",
+        "status": "Fishing"
+      },
+      "certifications": ["MSC-F-12345", "RFM", "BAP"],
+      "targetSpecies": ["Alaska Pollock", "Pacific Cod", "Yellowfin Sole"],
+      "vesselType": "Factory Trawler",
+      "length": 92.5,
+      "grossTonnage": 2850,
+      "crew": 120,
+      "image": "/images/vessels/pacific-star.jpg"
+    },
+    {
+      "id": "vessel-002",
+      "name": "Northern Dawn",
+      "imo": "9234567",
+      "mmsi": "338234567",
+      "flag": "USA",
+      "callSign": "WCF2345",
+      "operator": "New England Groundfish Association",
+      "homePort": "Portland, Maine",
+      "license": {
+        "number": "ME-COM-2025-00456",
+        "type": "Groundfish License",
+        "expires": "2025-11-30",
+        "issuer": "Maine Department of Marine Resources"
+      },
+      "currentPosition": {
+        "lat": 42.5,
+        "lon": -67.2,
+        "speed": 5.8,
+        "heading": 180,
+        "timestamp": "2025-10-20T13:15:00Z",
+        "status": "Transiting to port"
+      },
+      "certifications": ["MSC-COC-67890"],
+      "targetSpecies": ["Atlantic Cod", "Haddock", "Pollock"],
+      "vesselType": "Stern Trawler",
+      "length": 28.5,
+      "grossTonnage": 185,
+      "crew": 6,
+      "image": "/images/vessels/northern-dawn.jpg"
+    },
+    {
+      "id": "vessel-003",
+      "name": "Ocean Voyager",
+      "imo": "9345678",
+      "mmsi": "367345678",
+      "flag": "USA",
+      "callSign": "WYC3456",
+      "operator": "Pacific Fishing Fleet LLC",
+      "homePort": "Honolulu, Hawaii",
+      "license": {
+        "number": "HI-LH-2025-00789",
+        "type": "Longline Permit",
+        "expires": "2026-03-31",
+        "issuer": "NOAA Fisheries"
+      },
+      "currentPosition": {
+        "lat": 15.2,
+        "lon": 145.8,
+        "speed": 2.1,
+        "heading": 90,
+        "timestamp": "2025-10-20T08:45:00Z",
+        "status": "Hauling gear"
+      },
+      "certifications": ["MSC", "Dolphin Safe", "Fair Trade"],
+      "targetSpecies": ["Yellowfin Tuna", "Bigeye Tuna", "Albacore"],
+      "vesselType": "Longline Vessel",
+      "length": 35.2,
+      "grossTonnage": 245,
+      "crew": 12,
+      "image": "/images/vessels/ocean-voyager.jpg"
+    },
+    {
+      "id": "vessel-004",
+      "name": "Bristol Bay Runner",
+      "imo": "9456789",
+      "mmsi": "367456789",
+      "flag": "USA",
+      "callSign": "WBR4567",
+      "operator": "Alaska Salmon Co-op",
+      "homePort": "King Salmon, Alaska",
+      "license": {
+        "number": "AK-SET-2025-01234",
+        "type": "Limited Entry Setnet",
+        "expires": "2025-09-30",
+        "issuer": "Alaska Department of Fish & Game"
+      },
+      "currentPosition": {
+        "lat": 58.7,
+        "lon": -157.3,
+        "speed": 0.0,
+        "heading": 0,
+        "timestamp": "2025-10-20T16:00:00Z",
+        "status": "Moored"
+      },
+      "certifications": ["MSC", "Alaska RFM"],
+      "targetSpecies": ["Sockeye Salmon", "Chum Salmon"],
+      "vesselType": "Setnet Tender",
+      "length": 18.5,
+      "grossTonnage": 45,
+      "crew": 4,
+      "image": "/images/vessels/bristol-runner.jpg"
+    },
+    {
+      "id": "vessel-005",
+      "name": "Gulf Princess",
+      "imo": "9567890",
+      "mmsi": "367567890",
+      "flag": "USA",
+      "callSign": "WGP5678",
+      "operator": "Gulf Coast Shrimpers Inc",
+      "homePort": "Biloxi, Mississippi",
+      "license": {
+        "number": "MS-SH-2025-05678",
+        "type": "Shrimp Trawl License",
+        "expires": "2025-12-31",
+        "issuer": "Mississippi Department of Marine Resources"
+      },
+      "currentPosition": {
+        "lat": 29.2,
+        "lon": -88.5,
+        "speed": 3.5,
+        "heading": 135,
+        "timestamp": "2025-10-20T12:30:00Z",
+        "status": "Fishing"
+      },
+      "certifications": ["TED Certified", "BRD Certified"],
+      "targetSpecies": ["White Shrimp", "Brown Shrimp", "Pink Shrimp"],
+      "vesselType": "Shrimp Trawler",
+      "length": 22.0,
+      "grossTonnage": 85,
+      "crew": 3,
+      "image": "/images/vessels/gulf-princess.jpg"
+    },
+    {
+      "id": "vessel-006",
+      "name": "Atlantic Harvest",
+      "imo": "9678901",
+      "mmsi": "316678901",
+      "flag": "Canada",
+      "callSign": "CFW6789",
+      "operator": "Nova Scotia Lobster Co-op",
+      "homePort": "Yarmouth, Nova Scotia",
+      "license": {
+        "number": "NS-LOB-2025-06789",
+        "type": "Lobster Fishing License",
+        "expires": "2026-05-31",
+        "issuer": "Fisheries and Oceans Canada"
+      },
+      "currentPosition": {
+        "lat": 43.8,
+        "lon": -66.1,
+        "speed": 0.2,
+        "heading": 270,
+        "timestamp": "2025-10-20T14:00:00Z",
+        "status": "Hauling traps"
+      },
+      "certifications": ["MSC", "Ocean Wise"],
+      "targetSpecies": ["American Lobster"],
+      "vesselType": "Lobster Boat",
+      "length": 14.5,
+      "grossTonnage": 25,
+      "crew": 2,
+      "image": "/images/vessels/atlantic-harvest.jpg"
+    }
+  ]
+}

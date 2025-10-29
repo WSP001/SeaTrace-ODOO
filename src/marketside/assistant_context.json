@@ -1,0 +1,21 @@
+{
+  "module": "marketside",
+  "summary": "MarketSide: Pricing, entitlement enforcement, consumer verification, and marketplace integration.",
+  "entrypoint": "src.marketside.main:app",
+  "run_commands": [
+    "python -m uvicorn src.marketside.main:app --host 0.0.0.0 --port 8003"
+  ],
+  "test_command": "pytest tests/unit -q",
+  "important_files": [
+    {
+      "path": "src/marketside/pricing.py",
+      "summary": "Pricing and entitlement connectors"
+    },
+    {
+      "path": "src/marketside/verification.py",
+      "summary": "QR verification and consumer endpoint"
+    }
+  ],
+  "notes": "MarketSide consumes dock.origin_records and provides consumer verification endpoints. Keep entitlements and signing keys secure.",
+  "last_updated": "2025-10-28"
+}

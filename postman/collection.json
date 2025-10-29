@@ -1,0 +1,455 @@
+{
+  "info": {
+    "name": "SeaTrace - Four Pillars E2E Demo",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "End-to-end Postman collection for SeaTrace Four Pillars architecture: SeaSide (Vessel Tracking) → DeckSide (Catch Verification) → DockSide (Storage & Processing) → MarketSide (Consumer Verification & Trading). This collection demonstrates the PUBLIC/PRIVATE fork strategy with #KEY (free) vs $KEY (paid) operations."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://seatrace.worldseafoodproducers.com",
+      "type": "string",
+      "description": "Base URL for SeaTrace API endpoints (production)"
+    },
+    {
+      "key": "baseUrl_local",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Base URL for local development server"
+    },
+    {
+      "key": "vessel_id",
+      "value": "{{$randomUUID}}",
+      "type": "string",
+      "description": "Vessel ID (generated dynamically)"
+    },
+    {
+      "key": "catch_id",
+      "value": "",
+      "type": "string",
+      "description": "Catch ID (captured from DeckSide response)"
+    },
+    {
+      "key": "processing_id",
+      "value": "",
+      "type": "string",
+      "description": "Processing batch ID (captured from DockSide response)"
+    }
+  ],
+  "item": [
+    {
+      "name": "1️⃣ SeaSide - Vessel Tracking (PUBLIC ONLY 🔓)",
+      "description": "SeaSide APIs provide FREE vessel tracking, AIS overlay, and THREE CRITICAL TRIP MOMENTS (departure, catch event, return). NO precise GPS coordinates or vessel-specific data exposed in PUBLIC tier.",
+      "item": [
+        {
+          "name": "GET List All Vessels (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seaside/vessels",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seaside", "vessels"]
+            },
+            "description": "Returns approximate vessel locations for transparency (NGO/GFW API v3 integration). No precise GPS in PUBLIC endpoints."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Vessel by ID (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seaside/vessels/{{vessel_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seaside", "vessels", "{{vessel_id}}"]
+            },
+            "description": "Returns PUBLIC vessel information (approximate location, three critical trip moments)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Vessel Position (PUBLIC)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vessel_id\": \"{{vessel_id}}\",\n  \"timestamp\": \"{{$isoTimestamp}}\",\n  \"approximate_location\": {\n    \"region\": \"Southeast Alaska\",\n    \"zone\": \"District 13\"\n  },\n  \"trip_moment\": \"departure\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/seaside/vessels/{{vessel_id}}/positions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "seaside", "vessels", "{{vessel_id}}", "positions"]
+            },
+            "description": "Records vessel position for PUBLIC transparency. Trip moments: 'departure', 'catch_event', 'return'."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2️⃣ DeckSide - Catch Verification (DUAL KEY 🔓🔐 - THE FORK)",
+      "description": "DeckSide APIs implement THE FORK: PUBLIC #CATCH (basic compliance, approximate data) vs PRIVATE $CHECK (precise measurements, species ML 96% accuracy, Grade A catch assessment 94.2%).",
+      "item": [
+        {
+          "name": "GET List All Catches (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/deckside/catches",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "deckside", "catches"]
+            },
+            "description": "Returns PUBLIC catch records (approximate weights, common species names)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Catch (PUBLIC)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture catch_id for use in subsequent requests",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('catch_id', response.catch_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vessel_id\": \"{{vessel_id}}\",\n  \"timestamp\": \"{{$isoTimestamp}}\",\n  \"species\": \"Sockeye Salmon\",\n  \"approximate_weight_lbs\": 1200,\n  \"catch_location\": {\n    \"region\": \"Southeast Alaska\",\n    \"zone\": \"District 13\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/deckside/catches",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "deckside", "catches"]
+            },
+            "description": "Creates PUBLIC catch record. PRIVATE $CHECK tier includes precise GPS, ML species classification (96% accuracy), and exact weights."
+          },
+          "response": []
+        },
+        {
+          "name": "GET QR Code for Catch",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "image/png"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/deckside/qrcode?catch_id={{catch_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "deckside", "qrcode"],
+              "query": [
+                {
+                  "key": "catch_id",
+                  "value": "{{catch_id}}"
+                }
+              ]
+            },
+            "description": "Generates QR code for catch verification. Scanned by consumers in MarketSide."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3️⃣ DockSide - Storage & Processing (DUAL KEY 🔓🔐 - THE SECOND FORK)",
+      "description": "DockSide APIs implement THE SECOND FORK: PUBLIC #STORE (basic inventory) vs PRIVATE $STORE (fish ticket indexing with standard tally weights, H&G/fillet recovery % calculations, temperature logs, 33% cost savings via economies of scale).",
+      "item": [
+        {
+          "name": "GET List Processing Batches (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dockside/processing",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dockside", "processing"]
+            },
+            "description": "Returns PUBLIC processing batch records (approximate inventory counts)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Create Processing Batch (PUBLIC)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Capture processing_id for use in subsequent requests",
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('processing_id', response.processing_id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"catch_id\": \"{{catch_id}}\",\n  \"facility_id\": \"WSP-FAC-001\",\n  \"processing_type\": \"H&G\",\n  \"incoming_weight_lbs\": 1200,\n  \"timestamp\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dockside/processing",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dockside", "processing"]
+            },
+            "description": "Creates PUBLIC processing batch. PRIVATE $STORE tier includes: DS2 (Inventory Control) = fish ticket indexing with standard tally weights correlating incoming/outgoing forks; DS3 (Temperature Log) = storage standards for spoilage risk scoring (94% accuracy); Yield optimization = H&G recovery ~70-75%, Fillet recovery ~50-60%, proportional pricing adjustments."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Processing Batch by ID (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dockside/processing/{{processing_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dockside", "processing", "{{processing_id}}"]
+            },
+            "description": "Returns PUBLIC processing batch information (approximate yield, general status)."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4️⃣ MarketSide - Consumer Verification & Trading (DUAL KEY 🔓🔐 - THE THIRD FORK)",
+      "description": "MarketSide APIs implement THE THIRD FORK: PUBLIC QR verification (consumer transparency) vs PRIVATE trading platform (price discovery via WebSocket, settlement with smart contracts, blockchain immutability).",
+      "item": [
+        {
+          "name": "POST Verify QR Code (PUBLIC)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qr_code\": \"SEATRACE-{{catch_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/marketside/qr/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "marketside", "qr", "verify"]
+            },
+            "description": "Verifies QR code and returns catch provenance for consumer transparency (PUBLIC)."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Consumer Info (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/marketside/consumer/info?catch_id={{catch_id}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "marketside", "consumer", "info"],
+              "query": [
+                {
+                  "key": "catch_id",
+                  "value": "{{catch_id}}"
+                }
+              ]
+            },
+            "description": "Returns consumer-facing catch information (vessel region, species, catch date, certifications). No pricing or trading data in PUBLIC tier."
+          },
+          "response": []
+        },
+        {
+          "name": "GET Verification Summary (PUBLIC)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/marketside/verification",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "marketside", "verification"]
+            },
+            "description": "Returns aggregate verification statistics (total catches verified, regions covered). PRIVATE trading platform includes real-time price discovery, WebSocket updates, and smart contract settlement."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔒 Private Tier Examples (Requires $KEY Authentication)",
+      "description": "PRIVATE tier endpoints require authentication via JWT with PRIVATE key claims. These demonstrate the PAID features that fund the FREE Commons Good tier (34:1 cross-subsidy, 3,422% ROI).",
+      "item": [
+        {
+          "name": "POST DeckSide - Precise Catch Data (PRIVATE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{deckside_private_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vessel_id\": \"{{vessel_id}}\",\n  \"timestamp\": \"{{$isoTimestamp}}\",\n  \"precise_gps\": {\n    \"latitude\": 57.0521,\n    \"longitude\": -135.3284\n  },\n  \"species_ml_classification\": {\n    \"species\": \"Oncorhynchus nerka\",\n    \"confidence\": 0.96,\n    \"grade\": \"A\"\n  },\n  \"exact_weight_lbs\": 1247.3,\n  \"target_size_age\": {\n    \"average_size_cm\": 58,\n    \"estimated_age_years\": 4\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/deckside/catches/private",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "deckside", "catches", "private"]
+            },
+            "description": "PRIVATE $CHECK endpoint: Precise GPS, ML species classification (96% accuracy), exact weights, target size/age computation for commercial grading. Requires DeckSide PRIVATE tier subscription ($150/month per vessel)."
+          },
+          "response": []
+        },
+        {
+          "name": "POST DockSide - Fish Ticket Indexing (PRIVATE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{dockside_private_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"facility_id\": \"WSP-FAC-001\",\n  \"catch_id\": \"{{catch_id}}\",\n  \"fish_ticket_number\": \"AK-2025-12345\",\n  \"incoming_fork\": {\n    \"raw_supply_weight_lbs\": 1247.3,\n    \"standard_tally_weight_lbs\": 1250,\n    \"correlation_key\": \"PK2-FACILITY-001\"\n  },\n  \"processing_method\": \"H&G\",\n  \"outgoing_fork\": {\n    \"finished_product_weight_lbs\": 935.5,\n    \"recovery_percentage\": 75.0,\n    \"sku\": \"WSP-SockeyeHG-001\",\n    \"reconciliation_key\": \"PK2-FACILITY-001\"\n  },\n  \"temperature_log\": {\n    \"storage_temp_f\": 32,\n    \"spoilage_risk_score\": 0.06,\n    \"optimal_storage_days\": 14\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/dockside/processing/private",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "dockside", "processing", "private"]
+            },
+            "description": "PRIVATE $STORE endpoint: DS2 (Inventory Control) = fish ticket indexing with standard tally weights, correlates incoming raw supply with outgoing finished products via PK2 (Facility Keys). DS3 (Temperature Log) = storage standards, spoilage risk scoring (94% accuracy). Economies of scale = 33% cost reduction ($0.12→$0.08/lb). Requires DockSide PRIVATE tier subscription ($499/month per facility)."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set default headers for all requests",
+          "pm.request.headers.add({key: 'User-Agent', value: 'SeaTrace-Postman/1.0'});"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test: verify response time < 2000ms",
+          "pm.test('Response time is acceptable', function() {",
+          "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+          "});",
+          "",
+          "// Global test: verify no precise GPS in PUBLIC endpoints",
+          "if (!pm.request.url.path.includes('private')) {",
+          "    pm.test('PUBLIC endpoint does not expose precise GPS', function() {",
+          "        const response = pm.response.json();",
+          "        pm.expect(JSON.stringify(response)).to.not.include('latitude');",
+          "        pm.expect(JSON.stringify(response)).to.not.include('longitude');",
+          "    });",
+          "}"
+        ]
+      }
+    }
+  ]
+}

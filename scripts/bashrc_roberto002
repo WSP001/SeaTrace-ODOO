@@ -1,0 +1,219 @@
+# ~/.bashrc - Roberto002 WSL SeaTrace Development Environment
+# Last updated: 2025-10-28
+# Installation: Copy this to ~/.bashrc in your WSL distro (Ubuntu 22.04/24.04 LTS)
+# Usage: source ~/.bashrc (or open new terminal)
+
+# ============================================================================
+# ENVIRONMENT CONFIGURATION
+# ============================================================================
+export EDITOR=code
+export LANG=en_US.UTF-8
+
+# SeaTrace workspace paths (mapped from Windows to WSL)
+export WORKSPACE_ROOT="/mnt/c/Users/Roberto002/Documents/GitHub"
+export SEATRACE_ODOO="$WORKSPACE_ROOT/SeaTrace-ODOO"
+export SEATRACE_002="$WORKSPACE_ROOT/SeaTrace002"
+export SEATRACE_003="$WORKSPACE_ROOT/SeaTrace003"
+
+# Default to ODOO workspace (public docs)
+export SEATRACE_CURRENT="$SEATRACE_ODOO"
+
+# ============================================================================
+# NVM (Node Version Manager) - Safe Node.js installation
+# ============================================================================
+export NVM_DIR="$HOME/.nvm"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  . "$NVM_DIR/nvm.sh"
+  # Load bash_completion for nvm
+  [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+fi
+
+# ============================================================================
+# SAFE NPM GLOBAL PREFIX (no sudo required)
+# ============================================================================
+export NPM_GLOBAL_PREFIX="$HOME/.npm-global"
+export PATH="$NPM_GLOBAL_PREFIX/bin:$PATH"
+
+# Create npm global directory if missing
+if [ ! -d "$NPM_GLOBAL_PREFIX" ]; then
+  mkdir -p "$NPM_GLOBAL_PREFIX"
+  npm config set prefix "$NPM_GLOBAL_PREFIX" 2>/dev/null || true
+fi
+
+# ============================================================================
+# SSH-AGENT AUTO-START (for Git operations)
+# ============================================================================
+# Check both WSL .ssh and Windows .ssh locations
+SSH_KEY_WSL="$HOME/.ssh/id_ed25519_work"
+SSH_KEY_WIN="/mnt/c/Users/Roberto002/.ssh/id_ed25519_work"
+
+start_ssh_agent_if_needed() {
+  # Start ssh-agent if not running
+  if ! pgrep -u "$USER" -x ssh-agent >/dev/null 2>&1; then
+    eval "$(ssh-agent -s)" >/dev/null 2>&1
+  fi
+  
+  # Add key if present and not already added
+  SSHADD_LIST="$(ssh-add -l 2>/dev/null || true)"
+  if [ -z "$SSHADD_LIST" ] || echo "$SSHADD_LIST" | grep -q "The agent has no identities"; then
+    if [ -f "$SSH_KEY_WSL" ]; then
+      ssh-add "$SSH_KEY_WSL" >/dev/null 2>&1 || true
+    elif [ -f "$SSH_KEY_WIN" ]; then
+      ssh-add "$SSH_KEY_WIN" >/dev/null 2>&1 || true
+    fi
+  fi
+}
+
+# Auto-start on shell initialization
+start_ssh_agent_if_needed
+
+# ============================================================================
+# DIRENV SUPPORT (per-project environment variables)
+# ============================================================================
+if command -v direnv >/dev/null 2>&1; then
+  eval "$(direnv hook bash)"
+fi
+
+# ============================================================================
+# GIT ALIASES (convenience shortcuts)
+# ============================================================================
+alias gst='git status'
+alias gp='git pull'
+alias gpo='git push origin'
+alias gb='git branch'
+alias gco='git checkout'
+alias gl='git log --oneline --graph --decorate -10'
+alias gd='git diff'
+
+# ============================================================================
+# SEATRACE ALIASES
+# ============================================================================
+alias tree='ls -la'  # or install 'tree' package
+alias venv='. .venv/bin/activate'
+alias seastart='bash ./scripts/start_all.sh'
+alias seapreflight='bash ./scripts/preflight.sh'
+alias seaodoo='cd $SEATRACE_ODOO'
+alias sea002='cd $SEATRACE_002'
+alias sea003='cd $SEATRACE_003'
+
+# ============================================================================
+# TERMINAL DIVIDER HELPER (readable output separation)
+# ============================================================================
+divider() {
+  local msg="${1:-SECTION}"
+  local color="${2:-34}"  # Default: blue (34), green=32, yellow=33, red=31
+  printf "\n\033[1;${color}m===== %s =====\033[0m\n\n" "$msg"
+}
+
+# Usage examples:
+# divider "Starting Seaside Tests"
+# divider "ERROR: Build Failed" 31  # Red divider
+
+# ============================================================================
+# RUN_IN() - Execute command in specific directory (safety wrapper)
+# ============================================================================
+run_in() {
+  local dir="$1"; shift
+  local cmd="$@"
+  
+  if [ -z "$dir" ] || [ -z "$cmd" ]; then
+    echo "Usage: run_in <directory> <command>"
+    return 1
+  fi
+  
+  if [ -d "$dir" ]; then
+    divider "Running in $(basename $dir)" 34
+    echo "Directory: $dir"
+    echo "Command: $cmd"
+    ( cd "$dir" && eval "$cmd" )
+    local exit_code=$?
+    divider "Finished (exit code: $exit_code)" $([ $exit_code -eq 0 ] && echo "32" || echo "31")
+    return $exit_code
+  else
+    echo "❌ Directory not found: $dir"
+    return 1
+  fi
+}
+
+# ============================================================================
+# FOUR PILLARS QUICK NAVIGATION (SeaTrace003)
+# ============================================================================
+# Customize these paths if SeaTrace003 structure differs
+seaside()   { run_in "$SEATRACE_003/src/seaside" "$@"; }
+deckside()  { run_in "$SEATRACE_003/src/deckside" "$@"; }
+dockside()  { run_in "$SEATRACE_003/src/dockside" "$@"; }
+marketside() { run_in "$SEATRACE_003/src/marketside" "$@"; }
+
+# Usage examples:
+# seaside pytest -q
+# deckside python main.py
+# dockside bash scripts/process_incoming.sh
+
+# ============================================================================
+# PYTHON VIRTUALENV HELPER
+# ============================================================================
+mkvenv() {
+  if [ -d ".venv" ]; then
+    echo "⚠️  .venv already exists. Activate with: source .venv/bin/activate"
+    return 1
+  fi
+  
+  divider "Creating Python Virtual Environment" 32
+  python3 -m venv .venv
+  . .venv/bin/activate
+  pip install --upgrade pip
+  
+  if [ -f requirements.txt ]; then
+    echo "📦 Installing requirements.txt..."
+    pip install -r requirements.txt
+  fi
+  
+  divider "Virtual Environment Ready" 32
+  echo "Deactivate with: deactivate"
+}
+
+# ============================================================================
+# PATH ADDITIONS (local tools)
+# ============================================================================
+export PATH="$HOME/.local/bin:$PATH"
+
+# ============================================================================
+# CUSTOM PROMPT (show current repo + git branch)
+# ============================================================================
+if [ -n "$PS1" ]; then
+  # Simple prompt: user@host:path (branch) $
+  parse_git_branch() {
+    git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+  }
+  
+  export PS1='\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\[\033[01;33m\]$(parse_git_branch)\[\033[00m\]\$ '
+fi
+
+# ============================================================================
+# GITLEAKS HELPER (if installed)
+# ============================================================================
+gitleaks_check() {
+  if command -v gitleaks >/dev/null 2>&1; then
+    divider "Running Gitleaks Secret Scan" 33
+    gitleaks detect --source . --report-format json --report-path .gitleaks-report.json --redact
+    if [ $? -eq 0 ]; then
+      echo "✅ No secrets found"
+    else
+      echo "⚠️  Potential secrets detected. Review .gitleaks-report.json"
+    fi
+  else
+    echo "⚠️  gitleaks not installed. Install with: go install github.com/zricethezav/gitleaks/v8@latest"
+  fi
+}
+
+# ============================================================================
+# WELCOME MESSAGE (optional - comment out if too verbose)
+# ============================================================================
+if [ -n "$PS1" ]; then
+  echo ""
+  echo "🌊 SeaTrace Development Environment Loaded"
+  echo "   Workspace: $SEATRACE_CURRENT"
+  echo "   Node: $(node --version 2>/dev/null || echo 'not installed')"
+  echo "   Python: $(python3 --version 2>/dev/null || echo 'not installed')"
+  echo ""
+fi

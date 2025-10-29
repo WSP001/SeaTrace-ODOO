@@ -28,6 +28,47 @@ The **SeaTrace-ODOO Enterprise Integration Suite** combines SeaTrace's blockchai
 
 ## 🏗️ Four Pillars Architecture + ODOO Integration
 
+```mermaid
+graph TB
+    subgraph "1. SeaSide Module (HOLD) - PUBLIC KEY 🔓"
+        S1[F/V MASTER AIS Overlay]
+        S2[IoT Sensor Data]
+        S3[GFW/NGO Integration]
+        S4[Packet Creation]
+    end
+
+    subgraph "2. DeckSide Module (RECORD) - THE FORK 🔓🔐"
+        D1[Packet Switching Handler]
+        D2[PUBLIC Stream: #CATCH KEY]
+        D3[PRIVATE Stream: $CHECK KEY]
+        D4[Validation → Transform → Forward]
+    end
+
+    subgraph "3. DockSide Module (STORE) - THE SECOND FORK 🔓🔐"
+        DS1[Landing Reconciliation]
+        DS2[PUBLIC: #STORE KEY - Compliance]
+        DS3[PRIVATE: $STORE KEY - Analytics]
+        DS4[Blockchain Anchoring]
+    end
+
+    subgraph "4. MarketSide Module (EXCHANGE) - PRIVATE KEY 🔐"
+        M1[QR Verification PUBLIC]
+        M2[Trading Platform PRIVATE]
+        M3[Price Discovery PRIVATE]
+        M4[Settlement PRIVATE]
+    end
+
+    S4 --> D1
+    D2 --> DS1
+    D3 --> M2
+    DS4 --> M1
+```
+```
+
+### ODOO Integration Points
+
+Each SeaTrace pillar integrates with corresponding ODOO modules for enterprise financial management:
+
 ```
 ┌─────────────────┐    ┌──────────────────┐
 │   SeaSide       │◄──►│ ODOO Account     │  📂 PUBLIC KEY
@@ -36,22 +77,362 @@ The **SeaTrace-ODOO Enterprise Integration Suite** combines SeaTrace's blockchai
          │                       │
          ▼                       ▼
 ┌─────────────────┐    ┌──────────────────┐
-│   DeckSide      │◄──►│ ODOO Stock       │  📂 PUBLIC KEY
-│   (RECORD)      │    │ Account          │  🔓 Unlimited License
+│   DeckSide      │◄──►│ ODOO Stock       │  📂 DUAL KEYS
+│   (RECORD)      │    │ Account          │  🔓🔐 PUBLIC + PRIVATE
 └─────────────────┘    └──────────────────┘
          │                       │
          ▼                       ▼
 ┌─────────────────┐    ┌──────────────────┐
-│   DockSide      │◄──►│ ODOO Inventory   │  📂 PUBLIC KEY
-│   (STORE)       │    │ Management       │  🔓 Unlimited License
+│   DockSide      │◄──►│ ODOO Inventory   │  📂 DUAL KEYS
+│   (STORE)       │    │ Management       │  🔓🔐 PUBLIC + PRIVATE
 └─────────────────┘    └──────────────────┘
          │                       │
          ▼                       ▼
 ┌─────────────────┐    ┌──────────────────┐
-│   MarketSide    │◄──►│ ODOO Sales &     │  🔐 PRIVATE KEY
-│   (EXCHANGE)    │    │ Purchase         │  💰 Limited License
+│   MarketSide    │◄──►│ ODOO Sales &     │  � DUAL KEYS
+│   (EXCHANGE)    │    │ Purchase         │  🔓� PUBLIC + PRIVATE
 └─────────────────┘    └──────────────────┘
 ```
+
+### Pillar Details
+
+#### 🌊 **1. SeaSide (HOLD)** - Vessel Operations | PUBLIC KEY 🔓
+**Function:** F/V MASTER AIS overlay tracking vessels at THREE CRITICAL TRIP MOMENTS
+
+**🚨 THE STARTING POINT for all SeaTrace data flows**
+
+SeaSide is NOT about "catch recording" (that's DeckSide's job). This module creates the **foundation packets** from IoT sensor data captured at sea, using **NGO/Global Fishing Watch API integration** for vessel identity verification and behavior analysis.
+
+**Three Key Trip Moments (F/V MASTER AIS Overlay):**
+1. **BEFORE LEAVING:** Vessel position verification at dock, trip initialization, IoT sensor calibration
+2. **ON THE WAY BACK:** Return voyage tracking, approximate position PING events (FAO zone level)
+3. **ARRIVING AT PORT:** Final approach monitoring, landing preparation, packet finalization
+
+**Microservice Capabilities:**
+
+**NGO/GFW API v3 Integration:**
+- **Vessel Search:** Identity verification via IMO numbers, vessel name matching
+- **Position Tracking:** AIS data ingestion with gap detection (flags >4 hour reporting gaps as suspicious)
+- **Fishing Events:** Port visits, fishing activity, encounters with other vessels
+- **Behavior Analysis:** Tracks fishing hours, protected area violations, suspicious patterns
+- **Rate Limiting:** Async client with 10 concurrent requests max, 100ms intervals, 429 retry handling
+
+**Packet Creation Workflow:**
+```
+IoT Sensors → Data Aggregation → GFW Enrichment → Packet Assembly → DeckSide Routing
+```
+
+**Technical Implementation:**
+- `GFWIntegrator` async client (Python aiohttp) with asyncio.Semaphore rate limiting
+- `NGOAgent` handles data access requests, compliance checks, trust scores
+- Vessel size categorization: SMALL (<15 MT) vs LARGE (≥15 MT) determines regulatory requirements
+- Prometheus metrics: GFW_REQUEST_COUNT, GFW_ERROR_COUNT, GFW_REQUEST_DURATION
+
+**ODOO Integration:** Account module for vessel operational costs and crew payroll
+
+**Commons Good Commitment:** ✅ FREE forever - Transparent vessel operations
+
+**PUBLIC Data Exposed (F/V MASTER):**
+- **Approximate GPS:** FAO zone level only (e.g., "FAO Zone 77 - Georges Bank")
+- **Trip Metadata:** Start/end times, vessel IMO numbers, basic IoT sensor readings (temperature, salinity)
+- **Public PING Events:** Timestamped position reports at zone level
+- **Species Estimates:** Visual identification (e.g., "Atlantic Cod") WITHOUT precise counts
+
+**PRIVATE Data Hidden ($CHECK KEY):**
+- Precise 6-decimal GPS coordinates ("honey holes")
+- Exact fish counts and weight measurements
+- ML quality predictions and prospectus pricing
+- Proprietary fishing pattern analytics
+
+---
+
+#### � **2. DeckSide (RECORD)** - THE CRITICAL FORK | DUAL KEY 🔓🔐
+**Function:** Catch verification and the PUBLIC/PRIVATE data split point
+
+**🚨 THIS IS WHERE THE FORK HAPPENS:**
+
+DeckSide is the **central innovation** ($4.2M → $10M+ valuation driver) where catch data splits into two parallel streams:
+
+**PUBLIC STREAM - #CATCH KEY (Commons Good)** 🔓
+- **Estimated Weight:** Deckhand tally with ~5-10% margin of error
+- **Basic Species ID:** Visual identification (e.g., "Atlantic Cod")
+- **Approximate Count:** Estimated fish count for SIMP compliance
+- **Simple Grading:** Pass/Fail or basic A/B/C visual grades
+
+**PRIVATE STREAM - $CHECK KEY (Investor Value)** 🔐
+- **Prospectus Pricing:** ML-powered valuation (e.g., $25,400 catch prospectus)
+- **Exact Count:** Precise fish-by-fish counting (e.g., 392 fish vs. ~400)
+- **ML Quality Scores:** 94.2% Grade A confidence predictions
+- **ROI Analytics:** 70.1% return potential calculations
+- **Precise GPS:** 6-decimal fishing "honey holes" (F/V CAPTAIN coordinates)
+
+**Packet Switching Handler:**
+- Validates incoming catch packets from SeaSide
+- Transforms data through PUBLIC (#CATCH) and PRIVATE ($CHECK) pipelines
+- Routes approximate data to PUBLIC APIs, precise data to PRIVATE dashboards
+
+**ODOO Integration:** Stock Account module with dual valuation layers
+
+**Commons Good Commitment:** ✅ PUBLIC #CATCH KEY FREE forever | 💰 PRIVATE $CHECK KEY monetized
+
+---
+
+#### 🏭 **3. DockSide (STORE)** - Storage Operations | DUAL KEY 🔓🔐
+**Function:** Landing reconciliation and cold chain verification with advanced analytics
+
+**🚨 WHERE ESTIMATES MEET REALITY + ECONOMIES OF SCALE**
+
+DockSide is where the **#CATCH KEY estimated data** from DeckSide gets reconciled against **actual landed weights** and cold storage realities. This module validates that what was reported at sea matches what physically arrived at the dock.
+
+**THIS IS THE SECOND FORK** - DockSide splits into PUBLIC compliance tracking vs. PRIVATE inventory optimization and predictive analytics.
+
+**Landing Reconciliation Workflow:**
+```
+DeckSide PUBLIC Packet (~1200 lbs estimated)
+       ↓
+Vessel Arrival at Port
+       ↓
+Physical Unloading & Weighing (actual: 1,180 lbs)
+       ↓
+Variance Analysis (-20 lbs, -1.67% acceptable)
+       ↓
+Blockchain Anchoring (immutable verified record)
+       ↓
+Storage Assignment (cold chain tracking begins)
+```
+
+**Microservice Capabilities:**
+
+**PUBLIC STREAM - #STORE KEY (Commons Good)** 🔓
+
+**Landing Records Management:**
+- **Arrival Verification:** Match vessel IMO from SeaSide F/V MASTER PING with physical dock arrival
+- **Unloading Documentation:** Bill of lading, customs declarations, inspector sign-offs
+- **Weight Reconciliation:** Compare DeckSide #CATCH estimates with certified scale readings
+- **Variance Thresholds:** Flag catches with >5% weight variance for audit review
+
+**Storage Assignment Logic:**
+- **Species-Based Zoning:** Segregate high-value species (tuna, swordfish) from commodity species (cod, haddock)
+- **Temperature Requirements:** -20°C for long-term frozen, -2°C to +2°C for fresh/chilled
+- **Grade Segregation:** Keep Grade A separate from Grade B/C to prevent cross-contamination perception
+- **FIFO Tracking:** First-in-first-out inventory management for perishable goods
+
+**Cold Chain Monitoring:**
+- **IoT Sensor Network:** Temperature, humidity, door open/close events every 5 minutes
+- **Alert Thresholds:** Immediate alert if temperature deviates ±2°C from target for >15 minutes
+- **Blockchain Anchoring:** Hourly temperature snapshots written to immutable audit trail
+- **Compliance Reporting:** Automated HACCP logs for regulatory inspections
+
+**Quality Verification:**
+- **Visual Inspection:** Final grading to confirm/adjust DeckSide visual classifications
+- **Lab Testing:** Random sampling for species DNA verification (prevent fraud/mislabeling)
+- **Defect Documentation:** Photo evidence of damage, spoilage, or quality issues
+- **Grade Adjustment:** Downgrade catches that deteriorated during transport
+
+---
+
+**PRIVATE STREAM - $STORE KEY (Investor Value)** 🔐
+
+**Fish Ticket Indexing & Intelligence:**
+- **ML-Powered Classification:** Species identification by size/weight factors with 96% accuracy
+- **Commercial Species Profiling:** Automatic indexing by market value, seasonal demand, regulatory status
+- **Weight-to-Count Conversion:** Predict exact fish counts from aggregate weights using ML models
+- **Historical Pattern Analysis:** Track vessel landing patterns, predict future supply
+
+**Predictive Analytics:**
+- **Spoilage Risk Scoring:** ML models predict deterioration risk (94% accuracy)
+- **Optimal Storage Duration:** Calculate max shelf life based on catch quality, handling, temperature
+- **Grade Degradation Forecasting:** Predict when Grade A will drop to Grade B (±2 day accuracy)
+- **Yield Optimization:** Recommend processing timing for maximum fillet recovery
+
+**Economies of Scale Cost Savings:**
+- **Bulk Storage Optimization:** Reduce cost/lb by 33% ($0.12 → $0.08) through intelligent space allocation
+- **Energy Efficiency:** Dynamic temperature control saves 18% on cold storage energy costs
+- **Labor Optimization:** Automated inventory tracking reduces manual checking by 60%
+- **Insurance Savings:** Real-time monitoring + blockchain audit trail = 12% lower premiums
+
+**Supply Chain Building (Raw → Finished Product):**
+- **Finished Product Tracing:** Track individual fillet → retail package chain
+- **Processing Yield Analytics:** Calculate actual vs. expected yield by species, grade, vessel
+- **SKU-Level Inventory:** Manage finished goods (fillets, steaks, portions) with full traceability
+- **Retail Package QR Codes:** Generate consumer-facing QR codes linked to catch blockchain record
+
+**Advanced Reporting:**
+- **Cold Chain HACCP Dashboards:** Real-time compliance visualization for inspectors
+- **Grade Adjustment Trends:** Identify vessels/handling practices that maximize quality retention
+- **Inventory Turnover Metrics:** FIFO effectiveness, dead stock identification, reorder triggers
+- **Cost Per Pound Analytics:** Comprehensive P&L by species, vessel, season, storage duration
+
+**ODOO Integration:** Inventory Management module for warehouse operations
+
+**Commons Good Commitment:** ✅ PUBLIC #STORE KEY FREE forever | 💰 PRIVATE $STORE KEY monetized
+
+**Why This Matters:**
+- **Warehouse Operators:** FREE basic compliance + cold chain monitoring
+- **Processors:** Pay for predictive analytics that save 6.5× subscription cost through economies of scale
+- **Regulators:** FREE access to HACCP logs and blockchain audit trails
+- **Retail Buyers:** Pay for finished product tracing and SKU-level inventory intelligence
+
+**Monetization Impact:**
+- **Cost Savings:** $0.08/lb storage (vs $0.12 retail) = 33% reduction
+- **Spoilage Prevention:** 8% → 3% waste = 5% yield improvement
+- **Customer ROI:** $499/month subscription saves $45,000/year = 651% return
+
+---
+
+#### 💰 **4. MarketSide (EXCHANGE)** - Trading Platform | PRIVATE KEY 🔐
+**Function:** B2B trading with PUBLIC QR verification + PRIVATE dynamic pricing
+
+**🚨 THE DUAL-TRACK MARKETPLACE**
+
+MarketSide serves TWO completely different user experiences depending on which key you hold:
+
+---
+
+### **PUBLIC TRACK - QR Verification (Commons Good)** 🔓
+
+**Purpose:** Consumer confidence, brand transparency, regulatory compliance
+
+**QR Code Scan Experience:**
+```
+Consumer scans QR code on seafood package
+       ↓
+Displays PUBLIC #CATCH KEY traceability chain:
+  - Vessel IMO: IMO 9876543 (F/V MASTER public ID)
+  - Catch Date: January 15, 2025
+  - Approximate Location: FAO Zone 77 - Georges Bank
+  - Species: Atlantic Cod (Gadus morhua)
+  - Estimated Weight: ~1200 lbs (DeckSide #CATCH)
+  - Actual Landed Weight: 1,180 lbs (DockSide reconciliation)
+  - Grade: B (visual inspection)
+  - Storage: Cold storage #12, -20°C maintained
+  - Blockchain Anchor: 0x7a3f2... (immutable audit trail)
+```
+
+**Free Features:**
+- Basic traceability chain (vessel → dock → storage → retail)
+- Blockchain verification link
+- Species identification and catch location (FAO zone level)
+- Cold chain compliance status (pass/fail)
+- Sustainability certifications (MSC, ASC badges)
+
+**Use Cases:**
+- Restaurant menus: "Scan to see where your fish came from!"
+- Retail packaging: Build consumer trust with transparency
+- NGO verification: Confirm legal catch from permitted zones
+- Customs/border control: Rapid compliance verification
+
+---
+
+### **PRIVATE TRACK - Trading Platform (Monetized)** 🔐
+
+**Purpose:** B2B marketplace with ML-powered pricing and financial settlement
+
+**Buyer Dashboard Experience ($CHECK KEY Required):**
+```
+Logged-in buyer (subscription active) sees:
+  - Real-time Inventory Feed: 1,180 lbs Atlantic Cod, Grade A (ML 94.2% confidence)
+  - Prospectus Pricing: $25,400 ask ($21.53/lb with Grade A premium)
+  - ROI Analytics: 70.1% margin potential for high-end restaurants
+  - Precise GPS: 42.123456°N, -70.987654°W (fishing grounds intelligence)
+  - Historical Data: This vessel's catch quality trends over 6 months
+  - Market Intelligence: Current spot prices, seasonal demand forecasts
+```
+
+**Premium Features ($CHECK KEY):**
+- **Dynamic Pricing Engine:** Real-time spot market rates + sustainability premiums
+- **ML Quality Predictions:** Computer vision grading confidence scores (not just visual Pass/Fail)
+- **Buyer Pre-Purchase Verification:** Photo evidence, lab test results, exact counts
+- **Competitive Intelligence:** Fishing grounds data, vessel performance trends
+- **Automated Settlement:** Smart contract-based payment processing, escrow, insurance claims
+- **Advanced Analytics:** Species demand forecasting, price arbitrage opportunities, inventory optimization
+
+**Trading Workflow:**
+```
+1. Seller Lists Catch → Prospectus generated ($25,400 ask)
+2. Buyers Browse Private Feed → Filter by species/grade/location/price
+3. Buyer Submits Bid → $24,800 offer with delivery terms
+4. Seller Accepts/Counters → Negotiation or instant accept
+5. Smart Contract Executes → Payment to escrow, delivery scheduled
+6. Quality Confirmation → Buyer inspects upon delivery
+7. Settlement → Funds released to seller, blockchain record finalized
+```
+
+**Subscription Tiers:**
+- **Buyer Basic:** $499/month - Access to trading platform, standard pricing
+- **Buyer Premium:** $1,299/month - ML analytics, precise GPS, historical trends
+- **Seller Standard:** 2.5% transaction fee - List catches, accept bids
+- **Seller Pro:** 1.5% transaction fee + $299/month - Priority listing, marketing tools
+- **Enterprise:** Custom pricing - White label, API access, bulk discounts
+
+---
+
+### **Technical Architecture**
+
+**PUBLIC QR System:**
+- Static QR codes generated at packaging time
+- Links to `https://verify.seatrace.com/{catch_id}` (PUBLIC endpoint)
+- Serverless function fetches #CATCH KEY data from blockchain
+- No authentication required (public good)
+- Rate limited: 1000 scans/hour per IP (prevent scraping)
+
+**PRIVATE Trading Platform:**
+- JWT authentication with $CHECK KEY scope validation
+- Subscription status checked on every API call (active/expired)
+- Rate limiting: 10,000 API calls/month (Basic), 100,000/month (Premium)
+- WebSocket real-time price updates for Premium subscribers
+- Encrypted GPS coordinates (decryption key only for verified buyers)
+
+**Price Discovery Algorithm (PRIVATE):**
+```python
+def calculate_prospectus_price(catch_data, market_data):
+    base_price = market_data.spot_price[catch_data.species]
+    ml_grade_premium = catch_data.quality_prediction.confidence * 0.15
+    sustainability_premium = 0.10 if catch_data.certifications else 0
+    scarcity_multiplier = 1 / market_data.current_supply_ratio
+    
+    prospectus = base_price * (1 + ml_grade_premium + sustainability_premium) * scarcity_multiplier
+    return prospectus
+```
+
+---
+
+**ODOO Integration:**
+
+**Sales & Purchase Modules:**
+- **PUBLIC QR:** No ODOO integration (static verification, no transactions)
+- **PRIVATE Trading:** Full ERP integration
+  - Sale Orders: Automatically created when buyer bid accepted
+  - Purchase Orders: Seller's catch becomes saleable inventory
+  - Receivables: Automated invoicing with payment tracking
+  - Settlement: Bank reconciliation when smart contract releases funds
+
+**Example ODOO Flow (PRIVATE):**
+```
+1. Catch Listed → Creates draft Sale Order in ODOO ($25,400 value)
+2. Bid Accepted → Confirms Sale Order, sends invoice to buyer
+3. Payment Escrow → Records as "Prepayment" in Chart of Accounts
+4. Quality Confirmation → Finalizes sale, moves funds from escrow to revenue
+5. Settlement → Bank reconciliation, updates Cash at Bank account
+```
+
+---
+
+**Commons Good Commitment:**
+
+✅ **QR Verification (PUBLIC):** FREE forever - Consumer transparency tool  
+💰 **Trading Platform (PRIVATE):** Subscription-based - B2B marketplace for industry professionals
+
+**Why This Matters:**
+- **Consumers:** Get free traceability (scan QR codes, verify authenticity, zero cost)
+- **Regulators/NGOs:** Free access to compliance data (#CATCH KEY public chain)
+- **Buyers/Traders:** Pay for competitive advantages (ML pricing, GPS intelligence, ROI analytics)
+- **Sellers/Fishermen:** List catches for free (only pay transaction fees on successful sales)
+
+**Monetization Strategy:**
+- Transaction fees (1.5-2.5%) fund FREE infrastructure (SeaSide/DeckSide/DockSide)
+- Subscription revenue funds platform R&D and ML model improvements
+- Cross-subsidy model: B2B traders pay, consumers/regulators benefit for free
 
 ---
 
@@ -65,21 +446,33 @@ The **SeaTrace-ODOO Enterprise Integration Suite** combines SeaTrace's blockchai
 
 ### 🌊 Commons Charter
 
-SeaTrace is committed to **keeping SeaSide, DeckSide, and DockSide free forever** as a public good. Our [Commons Charter](docs/COMMONS_CHARTER.md) guarantees:
+SeaTrace is committed to **keeping SeaSide PUBLIC endpoints free forever** as a public good, while **3 monetized pillars** (DeckSide, DockSide, MarketSide) cross-subsidize the FREE infrastructure through packet switching handler innovation. Our [Commons Charter](docs/COMMONS_CHARTER.md) guarantees:
 
-✅ **No Retroactive Paywalls** - Free endpoints stay free  
-✅ **Transparent Funding** - 10-15% of MarketSide revenue funds free infrastructure  
+✅ **No Retroactive Paywalls** - FREE endpoints stay free  
+✅ **Transparent Funding** - 3 PRIVATE tier subscriptions fund 1 FREE tier (34:1 cross-subsidy ratio)  
 ✅ **Monthly Reporting** - Public Commons Fund metrics at `/api/commons/fund`  
 ✅ **Community Governance** - 90-day notice for any scope changes  
 
-**How it works:** MarketSide subscriptions cross-subsidize free pillar infrastructure. See real-time Commons Fund coverage at our [transparency dashboard](https://metrics.seatrace.worldseafoodproducers.com/commons).
+**How it works:** DeckSide, DockSide, and MarketSide PRIVATE subscriptions generate $120K/month revenue, funding $3.3K/month PUBLIC infrastructure costs. See real-time Commons Fund coverage at our [transparency dashboard](https://metrics.seatrace.worldseafoodproducers.com/commons).
+
+**Business Model Economics:**
+- **SeaSide:** PUBLIC only (MVP foundation, strategic loss leader)
+- **DeckSide:** PUBLIC estimates + PRIVATE ML pricing (generates $64,950/month)
+- **DockSide:** PUBLIC compliance + PRIVATE analytics (generates $14,970/month)
+- **MarketSide:** PUBLIC QR verify + PRIVATE trading (generates $40,465/month)
+- **Total Revenue:** $120,385/month from 3 monetized pillars
+- **Total Costs:** $7,400/month (all pillars + infrastructure)
+- **Net Profit:** $112,985/month (93.9% margin)
+- **ROI on FREE Tier:** 3,422% (Commons Good is highly profitable!)
+
+For detailed economics analysis, see [BUSINESS_MODEL_ECONOMICS.md](docs/BUSINESS_MODEL_ECONOMICS.md).
 
 | Component | License Type | Access Level | Commercial Use |
 |-----------|-------------|--------------|----------------|
 | **SeaSide** (Vessel Operations) | Unlimited | Public Key | ✅ Free |
-| **DeckSide** (Processing) | Unlimited | Public Key | ✅ Free |
-| **DockSide** (Storage) | Unlimited | Public Key | ✅ Free |
-| **MarketSide** (Trading) | Limited | Private Key | 💰 Monetized |
+| **DeckSide** (Processing) | Dual License | PUBLIC + PRIVATE | ✅ Free + 💰 Paid |
+| **DockSide** (Storage) | Dual License | PUBLIC + PRIVATE | ✅ Free + 💰 Paid |
+| **MarketSide** (Trading) | Dual License | PUBLIC + PRIVATE | ✅ Free + 💰 Paid |
 | **Core Framework** | MIT | Open Source | ✅ Free |
 
 ### 📋 License Files
@@ -92,22 +485,32 @@ SeaTrace is committed to **keeping SeaSide, DeckSide, and DockSide free forever*
 ## 💼 Business Model
 
 ### 🆓 Public Key Components (Free)
-- Vessel Operations Management (SeaSide)
-- Catch Processing Tracking (DeckSide)
-- Cold Storage Operations (DockSide)
+- **SeaSide:** Vessel Operations Management (F/V MASTER AIS overlay, NGO/GFW API integration)
+- **DeckSide PUBLIC:** Basic catch tracking (#CATCH KEY estimates, visual grading)
+- **DockSide PUBLIC:** Landing reconciliation (#STORE KEY compliance, cold chain monitoring)
+- **MarketSide PUBLIC:** QR verification (#MARKET KEY consumer transparency)
 - Basic ODOO Integration Framework
 
 ### 💰 Private Key Components (Monetized)
-- Dynamic Trading Platform (MarketSide)
-- Real-time Market Analytics
-- Premium Pricing Algorithms
-- Advanced Compliance Automation
+- **DeckSide PRIVATE:** ML-powered pricing ($CHECK KEY prospectus, exact counts, ROI analytics, precise GPS)
+- **DockSide PRIVATE:** Predictive analytics ($STORE KEY fish ticket indexing, spoilage prediction, economies of scale cost savings, finished product tracing)
+- **MarketSide PRIVATE:** Trading platform ($MARKET KEY B2B marketplace, dynamic pricing, smart contracts, buyer dashboards)
+- Advanced compliance automation and blockchain analytics
 
 ### 📈 Revenue Streams
-- **Private Key Licenses** - Monthly/Annual subscriptions
-- **Enterprise Support** - Custom integration services
-- **White Label Solutions** - Branded implementations
-- **Transaction Fees** - Percentage of MarketSide trades
+- **DeckSide Subscriptions:** $1,299/month × 50 subscribers = $64,950/month
+- **DockSide Subscriptions:** $499/month × 30 facilities = $14,970/month
+- **MarketSide Subscriptions:** Buyer/Seller tiers = $30,465/month
+- **Transaction Fees:** 2% on MarketSide trades = $10,000/month
+- **Total Monthly Revenue:** $120,385 from 3 monetized pillars
+- **Annual Revenue:** $1,444,620
+
+### 💡 Packet Switching Handler Innovation
+Each microservice (except SeaSide) uses **packet switching handler cryptography** to fork data streams:
+- **PUBLIC Fork (#KEY):** Approximate data, basic compliance, FAO zones → FREE
+- **PRIVATE Fork ($KEY):** ML predictions, exact measurements, precise GPS → PAID
+
+This innovation creates **dual revenue streams from one data source**, enabling the FREE tier to be cross-subsidized 34:1 by PRIVATE subscriptions. For technical details, see [PROCEEDING_MASTER_INTEGRATION.md](PROCEEDING_MASTER_INTEGRATION.md) and [packet_crypto.py](src/security/packet_crypto.py).
 
 ---
 

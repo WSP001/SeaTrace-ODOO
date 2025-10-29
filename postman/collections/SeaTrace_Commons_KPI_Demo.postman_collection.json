@@ -1,0 +1,557 @@
+{
+  "info": {
+    "name": "SeaTrace Commons KPI Demo (PUBLIC)",
+    "description": "PUBLIC-UNLIMITED: Developer adoption, QR verification, regulatory transparency. No secrets, no private endpoints. FOR THE COMMONS GOOD! 🌍🐟🚀",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "c0000001-0000-4000-8000-000000000001",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://dev.seatrace.worldseafoodproducers.com",
+      "type": "string",
+      "description": "Base URL for SeaTrace Commons API (PUBLIC endpoints only)"
+    },
+    {
+      "key": "qr_demo_code",
+      "value": "DEMO-QR-0001",
+      "type": "string",
+      "description": "Demo QR code for testing verification endpoint"
+    },
+    {
+      "key": "demo_license",
+      "value": "PUBLIC-DEMO-LICENSE",
+      "type": "string",
+      "description": "PUBLIC demo license (no actual authorization, for testing only)"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health & Status",
+      "description": "System health checks and status endpoints. No authentication required.",
+      "item": [
+        {
+          "name": "Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test 1: Response code",
+                  "pm.test('Status code is 200 (healthy)', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test 2: Response time (performance)",
+                  "pm.test('Response time under 500ms', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});",
+                  "",
+                  "// Test 3: Content-Type validation",
+                  "pm.test('Content-Type is JSON', () => {",
+                  "    pm.expect(pm.response.headers.get('content-type')).to.match(/application\\/json/i);",
+                  "});",
+                  "",
+                  "// Test 4: Response structure",
+                  "pm.test('Response has status field', () => {",
+                  "    const res = pm.response.json();",
+                  "    pm.expect(res).to.have.property('status');",
+                  "    pm.expect(res.status).to.be.a('string');",
+                  "});",
+                  "",
+                  "// Test 5: Rate limiting headers (Commons Good practice)",
+                  "['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'].forEach(header => {",
+                  "    pm.test(`Rate limit header ${header} is present`, () => {",
+                  "        pm.expect(pm.response.headers.has(header)).to.be.true;",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Simple health check endpoint. Returns 200 if service is operational. No authentication required. Used by load balancers and monitoring systems."
+          },
+          "response": []
+        },
+        {
+          "name": "Status Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has version and uptime', () => {",
+                  "    const res = pm.response.json();",
+                  "    pm.expect(res).to.have.property('version');",
+                  "    pm.expect(res).to.have.property('uptime');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["status"]
+            },
+            "description": "Detailed status endpoint with version and uptime information."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "JWKS (Public Keys)",
+      "description": "JSON Web Key Set (JWKS) endpoint for JWT signature verification. PUBLIC-UNLIMITED - no secrets exposed, only public keys.",
+      "item": [
+        {
+          "name": "Get JWKS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test 1: Response code",
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "// Test 2: JWKS structure validation",
+                  "pm.test('Response has keys array', () => {",
+                  "    const jwks = pm.response.json();",
+                  "    pm.expect(jwks).to.have.property('keys');",
+                  "    pm.expect(jwks.keys).to.be.an('array');",
+                  "});",
+                  "",
+                  "// Test 3: At least one key exists",
+                  "pm.test('At least one key is present', () => {",
+                  "    const jwks = pm.response.json();",
+                  "    pm.expect(jwks.keys.length).to.be.at.least(1);",
+                  "});",
+                  "",
+                  "// Test 4: Key format validation (JWK standard)",
+                  "pm.test('Keys have required JWK properties', () => {",
+                  "    const jwks = pm.response.json();",
+                  "    const key = jwks.keys[0];",
+                  "    pm.expect(key).to.have.property('kty'); // Key type",
+                  "    pm.expect(key).to.have.property('use'); // Public key use",
+                  "    pm.expect(key).to.have.property('kid'); // Key ID",
+                  "    pm.expect(key).to.have.property('alg'); // Algorithm",
+                  "});",
+                  "",
+                  "// Test 5: No private key components (security check)",
+                  "pm.test('Keys do NOT contain private components', () => {",
+                  "    const jwks = pm.response.json();",
+                  "    const key = jwks.keys[0];",
+                  "    pm.expect(key).to.not.have.property('d'); // RSA private exponent",
+                  "    pm.expect(key).to.not.have.property('p'); // RSA prime1",
+                  "    pm.expect(key).to.not.have.property('q'); // RSA prime2",
+                  "});",
+                  "",
+                  "// Test 6: Cache headers for performance",
+                  "pm.test('Cache-Control header present', () => {",
+                  "    pm.expect(pm.response.headers.has('cache-control')).to.be.true;",
+                  "});",
+                  "",
+                  "// Test 7: Rate limiting (Commons Good practice)",
+                  "['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'].forEach(header => {",
+                  "    pm.test(`Rate limit header ${header} present`, () => {",
+                  "        pm.expect(pm.response.headers.has(header)).to.be.true;",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/.well-known/jwks.json",
+              "host": ["{{baseUrl}}"],
+              "path": [".well-known", "jwks.json"]
+            },
+            "description": "Returns public keys for JWT signature verification. Complies with RFC 7517 (JSON Web Key). Used by developers to verify JWTs issued by SeaTrace. PUBLIC-UNLIMITED - contains only public key components, no private keys."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "MarketSide (QR Verification)",
+      "description": "Consumer-facing QR code verification endpoints. Used by restaurants, markets, and regulators to verify seafood provenance.",
+      "item": [
+        {
+          "name": "Verify QR Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Test 1: Accept both success and rate-limited responses",
+                  "pm.test('Status is 200 (verified) or 429 (rate-limited)', () => {",
+                  "    pm.expect([200, 429]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "// Test 2: Response structure (if not rate-limited)",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Response has verification_status', () => {",
+                  "        const res = pm.response.json();",
+                  "        pm.expect(res).to.have.property('verification_status');",
+                  "        pm.expect(res.verification_status).to.be.a('string');",
+                  "    });",
+                  "    ",
+                  "    pm.test('Response has catch metadata', () => {",
+                  "        const res = pm.response.json();",
+                  "        pm.expect(res).to.have.property('catch_id');",
+                  "        pm.expect(res).to.have.property('vessel_id');",
+                  "        pm.expect(res).to.have.property('timestamp');",
+                  "    });",
+                  "}",
+                  "",
+                  "// Test 3: Rate limiting headers (always present)",
+                  "['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'].forEach(header => {",
+                  "    pm.test(`Rate limit header ${header} present`, () => {",
+                  "        pm.expect(pm.response.headers.has(header)).to.be.true;",
+                  "    });",
+                  "});",
+                  "",
+                  "// Test 4: Response time (important for consumer UX)",
+                  "pm.test('Response time under 2 seconds', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "",
+                  "// Test 5: Content-Type validation",
+                  "pm.test('Content-Type is JSON', () => {",
+                  "    pm.expect(pm.response.headers.get('content-type')).to.match(/application\\/json/i);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-License-ID",
+                "value": "{{demo_license}}",
+                "description": "Demo license for PUBLIC testing (not a real license)"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"qr_code\": \"{{qr_demo_code}}\",\n  \"scan_location\": {\n    \"lat\": 47.6062,\n    \"lon\": -122.3321,\n    \"city\": \"Seattle\"\n  },\n  \"scanner_type\": \"mobile_app\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/marketside/qr/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "marketside", "qr", "verify"]
+            },
+            "description": "Verify a QR code and retrieve catch provenance data. Used by consumers, restaurants, and markets to validate seafood authenticity. Rate-limited to prevent abuse (200 requests/hour for PUBLIC demo license)."
+          },
+          "response": []
+        },
+        {
+          "name": "Get QR Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200 (found) or 404 (not found) or 429 (rate-limited)', () => {",
+                  "    pm.expect([200, 404, 429]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Response has status and verification_count', () => {",
+                  "        const res = pm.response.json();",
+                  "        pm.expect(res).to.have.property('status');",
+                  "        pm.expect(res).to.have.property('verification_count');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "X-License-ID",
+                "value": "{{demo_license}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/marketside/qr/{{qr_demo_code}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "marketside", "qr", "{{qr_demo_code}}", "status"]
+            },
+            "description": "Get the status of a QR code (active, expired, revoked). Includes verification count for transparency."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Public Models (Read-Only)",
+      "description": "Public read-only access to vessel, catch, and verification data. Used for regulatory compliance and transparency reports.",
+      "item": [
+        {
+          "name": "List Public Vessels",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200 or 429', () => {",
+                  "    pm.expect([200, 429]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Response is array', () => {",
+                  "        const res = pm.response.json();",
+                  "        pm.expect(res).to.be.an('array');",
+                  "    });",
+                  "    ",
+                  "    pm.test('Vessels have required fields', () => {",
+                  "        const res = pm.response.json();",
+                  "        if (res.length > 0) {",
+                  "            const vessel = res[0];",
+                  "            pm.expect(vessel).to.have.property('vessel_id');",
+                  "            pm.expect(vessel).to.have.property('vessel_name');",
+                  "            pm.expect(vessel).to.have.property('registration');",
+                  "        }",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/public/vessels?limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "public", "vessels"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "List public vessels with basic information (NO precise GPS, NO financial data). Used by regulators and researchers."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Catch Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200 (found) or 404 (not found)', () => {",
+                  "    pm.expect([200, 404]).to.include(pm.response.code);",
+                  "});",
+                  "",
+                  "if (pm.response.code === 200) {",
+                  "    pm.test('Catch has public metadata only', () => {",
+                  "        const res = pm.response.json();",
+                  "        pm.expect(res).to.have.property('catch_id');",
+                  "        pm.expect(res).to.have.property('species');",
+                  "        pm.expect(res).to.have.property('timestamp');",
+                  "        // Verify NO precise GPS or financial data",
+                  "        pm.expect(res.location).to.not.have.property('precise_lat');",
+                  "        pm.expect(res).to.not.have.property('pricing');",
+                  "    });",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/public/catch/CATCH-000-001",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "public", "catch", "CATCH-000-001"]
+            },
+            "description": "Get PUBLIC catch details (species, approximate location, timestamp). NO precise GPS, NO financial data. Commons Good transparency."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Load Testing Endpoints",
+      "description": "Endpoints used for k6 load testing and performance monitoring. PUBLIC access for transparency.",
+      "item": [
+        {
+          "name": "Prometheus Metrics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Content-Type is Prometheus format', () => {",
+                  "    const ct = pm.response.headers.get('content-type');",
+                  "    pm.expect(ct).to.match(/text\\/plain|application\\/openmetrics-text/i);",
+                  "});",
+                  "",
+                  "pm.test('Response contains metrics', () => {",
+                  "    const body = pm.response.text();",
+                  "    pm.expect(body).to.include('# HELP');",
+                  "    pm.expect(body).to.include('# TYPE');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "text/plain"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/metrics/prometheus",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "v1", "metrics", "prometheus"]
+            },
+            "description": "Prometheus metrics endpoint for monitoring. PUBLIC access to demonstrate transparency and performance. Used by k6 load tests."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global pre-request script for ALL requests in this collection",
+          "",
+          "// Add unique request ID for tracing",
+          "if (!pm.variables.get('requestId')) {",
+          "    pm.variables.set('requestId', 'REQ-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9));",
+          "}",
+          "pm.request.headers.upsert({",
+          "    key: 'X-Request-ID',",
+          "    value: pm.variables.get('requestId')",
+          "});",
+          "",
+          "// Add User-Agent for tracking",
+          "pm.request.headers.upsert({",
+          "    key: 'User-Agent',",
+          "    value: 'PostmanRuntime/SeaTrace-Commons-KPI-Demo/1.0.0'",
+          "});",
+          "",
+          "console.log('🌊 Request:', pm.info.requestName, '| ID:', pm.variables.get('requestId'));"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test script for ALL requests in this collection",
+          "",
+          "// Log response summary",
+          "console.log('✅ Response:', pm.response.code, '|', pm.response.responseTime + 'ms');",
+          "",
+          "// Track rate limiting across requests",
+          "if (pm.response.headers.has('X-RateLimit-Remaining')) {",
+          "    const remaining = pm.response.headers.get('X-RateLimit-Remaining');",
+          "    pm.collectionVariables.set('last_rate_limit_remaining', remaining);",
+          "    console.log('⏱️  Rate limit remaining:', remaining);",
+          "}",
+          "",
+          "// Warn if approaching rate limit",
+          "if (pm.response.code === 429) {",
+          "    const resetTime = pm.response.headers.get('X-RateLimit-Reset');",
+          "    console.warn('⚠️  RATE LIMITED! Reset at:', new Date(resetTime * 1000).toISOString());",
+          "}"
+        ]
+      }
+    }
+  ]
+}
