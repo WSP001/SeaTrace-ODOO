@@ -444,6 +444,8 @@ def calculate_prospectus_price(catch_data, market_data):
 
 **PUBLIC KEY IS FREE, PRIVATE KEY IS MONETIZED**
 
+> **❓ Questions about security?** See [Access Control FAQ](docs/ACCESS_CONTROL_FAQ.md) - "Can anybody with this link make changes?"
+
 ### 🌊 Commons Charter
 
 SeaTrace is committed to **keeping SeaSide PUBLIC endpoints free forever** as a public good, while **3 monetized pillars** (DeckSide, DockSide, MarketSide) cross-subsidize the FREE infrastructure through packet switching handler innovation. Our [Commons Charter](docs/COMMONS_CHARTER.md) guarantees:
@@ -678,6 +680,9 @@ trade_result = sdk.marketside.process_trade({
 ---
 
 ## 📚 Documentation
+
+### Security & Access Control
+- **[Access Control FAQ](docs/ACCESS_CONTROL_FAQ.md)** - "Can anybody with this link make changes?" Comprehensive security guide
 
 ### Technical Documentation
 - [Integration Guide](docs/integration-guides/odoo-setup.md)
