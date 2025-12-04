@@ -3,8 +3,8 @@
 
 ---
 
-## 🎯 *SeaTrace Programming Team() sINTEGRATION PLAYBOOK 
-This document explains how to integrate **Proceeding Master** (SeaTrace002 private repo) cryptographic components into **SeaTrace-ODOO** (public repo).
+## 🎯 *SeaTrace Programming Team(s) INTEGRATION PLAYBOOK 
+This document explains how to integate **Proceeding Master** (SeaTrace002 private repo) cryptographic components into **SeaTrace-ODOO** (public repo).
 
 ---
 
