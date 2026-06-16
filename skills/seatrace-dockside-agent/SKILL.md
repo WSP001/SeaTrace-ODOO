@@ -108,11 +108,31 @@ Level 4: Run 2 PASS (Antigravity)            ← unlocks MarketSide (Run 3)
 
 ---
 
+## EM Toggle Governance (Cross-Pillar — This Pillar's Responsibility)
+
+The Electronic Monitoring toggle is a cross-pillar disclosure event.
+**DockSide owns Step 08 (Public/Private Split) and EM Yield Pipeline alignment.**
+
+When EM is ACTIVE:
+- Observer Corridor Disclosures show secure unmasking notifications
+- EM Yield Pipeline CSS flowchart renders (#CATCH → fillet PRODUCT weight)
+- Scale-matching fields align with v7.5 schema
+
+**Rules:**
+- DockSide reconciliation must use v7.5 scale-matching fields (FROZEN)
+- EM yield pipeline must not expose raw yield outside observer corridor
+- Gate system must still enforce delta threshold regardless of EM state
+- Boundary check: `campaign-boundary-check.ps1 → PASS` required
+
+---
+
 ## Gate: What Blocks This Pillar
 
 - [ ] Run 1 PASS (SeaSide + DeckSide proof verified)
 - [ ] Reconciliation logic tested with fixture data
 - [ ] Gate system produces standardized exception_reason for BLOCKED lots
+- [ ] Scale-matching fields align with v7.5 schema (FROZEN)
+- [ ] EM yield pipeline boundary check passes
 - [ ] Antigravity verification
 
 ---

@@ -102,11 +102,31 @@ Level 4: Run 1 PASS (Antigravity)            ← unlocks DockSide (Run 2)
 
 ---
 
+## EM Toggle Governance (Cross-Pillar — This Pillar's Responsibility)
+
+The Electronic Monitoring toggle is a cross-pillar disclosure event.
+**DeckSide owns Step 05 (Recovery Bridge) unmask behavior.**
+
+When EM is ACTIVE:
+- Recovery yield (e.g., 55.8%) unmasks under "Public Output"
+- Yield formula unmasks
+- Weight ratio (raw→fillet) unmasks
+- Institutional Observer Corridor status → ACTIVE (Telemetry Unmasked)
+
+**Rules:**
+- EM unmask must NEVER expose private fields to the #CATCH rail outside the observer corridor
+- Boundary check must pass after every toggle state change
+- Trusted External Information Packet must remain schema-compliant
+- v7.5 schema (pairing hashes, scale-matching) must be FROZEN before V008
+
+---
+
 ## Gate: What Blocks This Pillar
 
 - [ ] SeaSide proxy/API proof (Run 1 prerequisite)
 - [ ] `data/peterpan-publix-sockeye-fixture.json` estimate fields populated
 - [ ] $CHECK fork test passes (private data never leaks to #CATCH rail)
+- [ ] EM toggle boundary check passes
 - [ ] Antigravity verification
 
 ---

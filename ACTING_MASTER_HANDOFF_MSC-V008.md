@@ -261,6 +261,85 @@ Owner GO is required for every rail crossing.
 
 ---
 
+## 9. V7.5 CARRY-FORWARD — MUST LOCK BEFORE V008 PREP BEGINS
+
+### A. EM/Observer Mode Governance Rules
+
+The Electronic Monitoring toggle is a **cross-pillar disclosure event**.
+It unmasks recovery yield, formula, raw→fillet ratios, and the EM Yield Pipeline.
+
+**Governance:**
+- EM toggle is owned by DeckSide → DockSide → MarketSide (all three skills)
+- Must NEVER unmask private fields to the #CATCH rail
+- Must ALWAYS pass boundary checks before deploy
+- Dynamic unmask transitions verified in Steps 05, 08, 09
+- Trusted External Information Packet (NGO-verified JSON) must remain schema-compliant
+
+### B. v7.5 Schema Lock
+
+The following must be FROZEN before V008 PREP work begins:
+
+| Item | Status | Source |
+|------|--------|--------|
+| Pairing hashes | INTEGRATED | `seatrace_pydantic_public_private_schema.md` |
+| Scale-matching fields | INTEGRATED | v7.5 walkthrough verification |
+| Updated FastAPI endpoints | INTEGRATED | Pydantic schema alignment |
+| Recovery yield display rules | LOCKED | `recovery_label: "conversion measured"` only on public |
+| EM Yield Pipeline CSS flowchart | VERIFIED | Antigravity screenshot proof |
+
+**No schema changes after lock. V008 adds behavior, not structure.**
+
+### C. Preview-Safe Narrative Rules
+
+On ALL public surfaces (campaign, harness, README, PR descriptions):
+
+- No partner claims (no "Peter Pan partnership confirmed")
+- No agency claims (no "contracted with X")
+- No MSC certification claims (no "MSC certified")
+- No "verified by NOAA/USDA/FDA" language
+- No raw yield percentages
+- No settlement amounts or pricing
+- Aspirational language only: "designed to support", "aligned with", "scenario-safe"
+
+### D. V008 PREP Goal
+
+One complete SeaSide → DeckSide → DockSide → MarketSide proof rail
+with EM toggle integrated and schema v7.5 locked.
+
+```
+SeaSide (proxy/API proof)
+    → DeckSide (estimate + EM toggle unmask)
+        → DockSide (reconciliation + gate + scale-match)
+            → MarketSide (QR trace + proof card + narrative)
+```
+
+All four checkpoints active. Zero Arbiter Law hits. Schema frozen.
+**That is V008 PREP complete.**
+
+---
+
+## 10. WHAT THE ACTING MASTER ISSUES NEXT
+
+```
+GO-SEATRACE-V008-PREP-START
+  scope:
+    - freeze v7.5 schema
+    - freeze EM toggle behavior
+    - freeze preview URLs
+    - authorize worktree creation
+    - authorize OPEN rows
+    - authorize proxy/API proof
+    - block all UI expansion until SeaSide proof passes
+```
+
+Once issued, Cascade prepares:
+- Pillar-specific SKILL.md updates (EM governance added) ✅
+- OPEN rows for unclaimed obligations
+- MSC Run 1 branch plan
+- Team-ready announcement
+
+---
+
 *Commons Good CC BY-SA 4.0 — Roberto Scott Echols, WorldSeafoodProducers.com*
 *Progressive disclosure: agent → justfile → skill → proof → next disclosure*
-*Wind blows in both directions — external sells, internal measures, both advance together.*
+*Public v007.5 → Private V008 PREP. Wind blows in both directions.*

@@ -150,12 +150,33 @@ Level 5: Owner GO → MarketSide live          ← partner claims unlocked
 
 ---
 
+## EM Toggle Governance (Cross-Pillar — This Pillar's Responsibility)
+
+The Electronic Monitoring toggle is a cross-pillar disclosure event.
+**MarketSide owns Step 09 (Walk to the Vault) and telemetry disclosure.**
+
+When EM is ACTIVE:
+- Vault unmasks partially with "Observer Tunnel Active" message
+- Private-rail records (Yield Only) disclosed to observer corridor
+- Yield and recovery math marked as "Disclosed"
+- EM telemetry must remain public-safe (no settlement, no pricing)
+
+**Rules:**
+- MarketSide telemetry disclosures must pass Arbiter Law check
+- No raw pricing exposed even when EM is active
+- Proof cards must show `recovery_label: "conversion measured"` (never raw %)
+- QR trace proof_status unaffected by EM state (always requires 4 checkpoints)
+- Preview-safe narrative rules apply to all EM-disclosed content
+
+---
+
 ## Gate: What Blocks This Pillar
 
 - [ ] Run 2 PASS (DockSide proof verified)
 - [ ] QR trace assembles all 4 checkpoints from fixture data
 - [ ] Proof cards render with zero Arbiter Law hits
 - [ ] No raw yield/pricing on public surface
+- [ ] EM telemetry disclosures pass Arbiter Law check
 - [ ] Antigravity verification
 
 ---
