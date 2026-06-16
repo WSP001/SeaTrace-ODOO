@@ -1,0 +1,235 @@
+{
+  "msc_version": "MSC-V008",
+  "date": "2026-06-16",
+  "owner": "Roberto Scott Echols (Acting Master)",
+  "status": "ACTIVE",
+  "twin_parallel": {
+    "external": {
+      "repo": "seatrace-campaign",
+      "deploy": "seatrace-campaign.netlify.app",
+      "rail": "public",
+      "spine": "content-store.json"
+    },
+    "internal": {
+      "repo": "SeaTrace-ODOO",
+      "deploy": "local-only (Phase 1)",
+      "rail": "private",
+      "playbook": "ENGINEERING_PLAYBOOK.md"
+    }
+  },
+  "chapters": [
+    {
+      "chapter": 1,
+      "pillar": "SeaSide",
+      "stage_verb": "HOLD",
+      "msc_tag": "MSC-V008-SS",
+      "status": "STUDY",
+      "etl_jobs": [
+        "gfw_vessel_ingest",
+        "ais_feed_consumer",
+        "prometheus_scrape_seaside"
+      ],
+      "cost_dimensions": ["gfw_api_calls", "ais_ingestion_rate"],
+      "port": 8000,
+      "metrics_paths": ["/metrics", "/metrics/sustainability"],
+      "license_rail": "CATCH",
+      "components": [
+        "ais_integration.py",
+        "predictive_analytics.py",
+        "hold_system.py",
+        "hold_system_ai.py",
+        "GFWClient",
+        "VesselDataProvider (MCP)"
+      ],
+      "endpoints": [
+        {"path": "/api/v1/seaside/vessels", "rail": "CATCH", "method": "GET"},
+        {"path": "/api/v1/seaside/sustainability", "rail": "CATCH", "method": "GET"}
+      ]
+    },
+    {
+      "chapter": 2,
+      "pillar": "DeckSide",
+      "stage_verb": "RECORD",
+      "msc_tag": "MSC-V008-DS",
+      "status": "STUDY",
+      "etl_jobs": [
+        "fish_ticket_ingest",
+        "emr_sync",
+        "prometheus_scrape_deckside"
+      ],
+      "cost_dimensions": ["fish_ticket_creation_rate", "emr_sync_ops"],
+      "port": 8003,
+      "metrics_paths": ["/metrics"],
+      "license_rail": "CATCH (read) / CHECK (write-projections)",
+      "components": [
+        "app.py (FastAPI)",
+        "emr_integration.py",
+        "analyzers/"
+      ],
+      "endpoints": [
+        {"path": "/api/v1/deckside/tickets", "rail": "CATCH", "method": "GET"},
+        {"path": "/api/v1/deckside/tickets", "rail": "CHECK", "method": "POST"},
+        {"path": "/api/v1/deckside/projections", "rail": "CHECK", "method": "GET"}
+      ]
+    },
+    {
+      "chapter": 3,
+      "pillar": "DockSide",
+      "stage_verb": "STORE",
+      "msc_tag": "MSC-V008-DK",
+      "status": "STUDY",
+      "etl_jobs": [
+        "certification_store",
+        "reconciliation_engine",
+        "prometheus_scrape_dockside"
+      ],
+      "cost_dimensions": ["certification_events", "storage_io_ops"],
+      "port": 8004,
+      "metrics_paths": ["/metrics"],
+      "license_rail": "CATCH (certs) / CHECK (reconciliation)",
+      "components": [
+        "app.py",
+        "handlers/",
+        "security/ (encryption)",
+        "blockchain_mint"
+      ],
+      "endpoints": [
+        {"path": "/api/v1/dockside/certifications", "rail": "CATCH", "method": "GET"},
+        {"path": "/api/v1/dockside/reconciliation", "rail": "CHECK", "method": "GET"}
+      ]
+    },
+    {
+      "chapter": 4,
+      "pillar": "MarketSide",
+      "stage_verb": "EXCHANGE",
+      "msc_tag": "MSC-V008-MS",
+      "status": "STUDY",
+      "etl_jobs": [
+        "qr_trace_pipeline",
+        "settlement_engine",
+        "pricing_feed",
+        "prometheus_scrape_marketside"
+      ],
+      "cost_dimensions": ["qr_scans", "settlement_transactions", "pricing_updates"],
+      "port": 8002,
+      "metrics_paths": ["/metrics"],
+      "license_rail": "CATCH (trace) / CHECK (settlement+pricing)",
+      "components": [
+        "app.py",
+        "traceability.py",
+        "pricing.py"
+      ],
+      "endpoints": [
+        {"path": "/api/v1/marketside/trace", "rail": "CATCH", "method": "GET"},
+        {"path": "/api/v1/marketside/settlement", "rail": "CHECK", "method": "GET"},
+        {"path": "/api/v1/marketside/pricing", "rail": "CHECK", "method": "GET"}
+      ]
+    },
+    {
+      "chapter": 5,
+      "pillar": "Cross-Cutting",
+      "stage_verb": "AUTH",
+      "msc_tag": "MSC-V008-AUTH",
+      "status": "Phase 1.5A",
+      "etl_jobs": ["token_verification_metrics", "key_rotation_audit"],
+      "cost_dimensions": ["auth_requests_per_second"],
+      "components": [
+        "LicenseMiddleware (async)",
+        "Ed25519 JWS validator",
+        "JWK kid key store",
+        "timing-floor guard"
+      ],
+      "source": "Devin Phase 1.5A patch pack (pending import)"
+    },
+    {
+      "chapter": 6,
+      "pillar": "Cross-Cutting",
+      "stage_verb": "ETL",
+      "msc_tag": "MSC-V008-ETL",
+      "status": "STUDY",
+      "etl_jobs": [
+        "prometheus_extract (scrape_configs)",
+        "prometheus_transform (relabel + rules)",
+        "prometheus_load (alertmanager + grafana)"
+      ],
+      "cost_dimensions": ["per_pillar_api_cost_units"],
+      "reference_files": [
+        "prometheus_client (venv library)",
+        "mcp_connectors.yml (9 jobs)",
+        "legacy prometheus.yml (4 pillars)",
+        "seaside prometheus.yml (study target)"
+      ]
+    },
+    {
+      "chapter": 7,
+      "pillar": "Cross-Cutting",
+      "stage_verb": "LICENSE",
+      "msc_tag": "MSC-V008-LIC",
+      "status": "Phase 1.5A",
+      "catch_paths": [
+        "/api/v1/seaside/vessels",
+        "/api/v1/seaside/sustainability",
+        "/api/v1/deckside/tickets (read)",
+        "/api/v1/dockside/certifications",
+        "/api/v1/marketside/trace",
+        "/metrics",
+        "/metrics/sustainability",
+        "/health"
+      ],
+      "check_paths": [
+        "/api/v1/marketside/settlement",
+        "/api/v1/marketside/pricing",
+        "/api/v1/deckside/projections",
+        "/api/v1/dockside/reconciliation",
+        "/metrics/security"
+      ],
+      "yield_rule": "PUBLIC surfaces use recovery_label='conversion measured'. NEVER raw yield_percentage."
+    },
+    {
+      "chapter": 8,
+      "pillar": "Twin-Parallel",
+      "stage_verb": "CAMPAIGN",
+      "msc_tag": "MSC-V008-CAMP",
+      "status": "ACTIVE",
+      "repo": "seatrace-campaign",
+      "gate": "just site-check",
+      "language_scrub": {
+        "PRIVATE": "permissioned",
+        "LIVE": "only if actually deployed",
+        "VERIFIED": "designed to verify"
+      }
+    },
+    {
+      "chapter": 9,
+      "pillar": "Twin-Parallel",
+      "stage_verb": "DASHBOARD",
+      "msc_tag": "MSC-V008-DASH",
+      "status": "SPEC",
+      "repo": "seatrace-campaign-dashboard",
+      "panels": [
+        "Backlinks Flow",
+        "Keyword Rankings",
+        "Traffic by Landing Page",
+        "Conversion Events",
+        "Content-Store Coverage Matrix",
+        "Campaign Health Score"
+      ]
+    }
+  ],
+  "phase_1_5a": {
+    "source": "Devin workspace output",
+    "artifact": "seatrace_phase_1_5a_patch_pack.zip",
+    "on_disk": false,
+    "components": [
+      "Async-safe LicenseMiddleware",
+      "Ed25519 JWS validation with JWK kid rotation",
+      "Timing-floor mitigation",
+      "X-Correlation-Id generation",
+      "PL 14-day expiration grace",
+      "Optional CRL checks (fail-open)",
+      "Bearer + X-SeaTrace-License support",
+      "25 focused tests"
+    ],
+    "blocker": "Zip file not found on local machine — needs transfer from Devin workspace"
+  }
+}
